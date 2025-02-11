@@ -22,7 +22,7 @@ public class Main {
       System.out.println("output : " + output);
 
       // output 기반의 핸들링 영역
-      if (!output.trim().equals("0")) {
+      if (!output.equals("0")) {
         // 프로세스 상태 정상
         System.out.println("프로세스 상태 정상");
       } else {
