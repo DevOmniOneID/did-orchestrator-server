@@ -1,0 +1,16 @@
+services:
+  postgres:
+    container_name: postgre-opendid
+    image: postgres:16.4
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5430:5432
+    environment:
+      POSTGRES_USER: omn
+      POSTGRES_PASSWORD: omn
+      POSTGRES_DB: omn
+
+volumes:
+  postgres_data:

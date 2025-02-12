@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Health Check</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #000000;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .status-icon {
+      margin-left: 10px;
+      font-size: 20px;
+      width: 20px;
+      text-align: center;
+    }
+    .server-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .server-name {
+      width: 120px;
+      display: inline-block;
+      text-align: left;
+    }
+
+    .shutdown-btn {
+      background-color: red;
+      padding: 10px 20px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .shutdown-btn:hover {
+      background-color: darkred;
+    }
+
+    .result {
+      flex-grow: 1;
+      text-align: left;
+    }
+  </style>
+  <script th:inline="javascript">
+    const serviceNames = [[${serviceNames}]];
+    const ports = [[${servicePorts}]];
+    async function requestServer(action, port) {
+      if (!port) {
+        alert('port is empty');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/${action}/${port}`, { method: 'GET' });
+        const resultElement = document.getElementById('result-' + port);
+
+        if (!response.ok) {
+          resultElement.innerText = `Error: ${await response.text()}`;
+          setHealthIcon(port, false);
+          return;
+        }
+
+        const data = await response.json();
+        resultElement.innerText = `Status: ${data.status}`;
+
+        setHealthIcon(port, data.status === "UP");
+      } catch (error) {
+        document.getElementById('result-' + port).innerText = 'Error: ' + error.message;
+        setHealthIcon(port, false);
+      }
+    }
+    async function requestFabricStart() {
+      try {
+        const response = await fetch(`/startup/fabric`, { method: 'GET' });
+        const resultElement = document.getElementById('result-fabric');
+
+        if (!response.ok) {
+          resultElement.innerText = `Error: ${await response.text()}`;
+          setHealthIconFabric(data.status === "UP");
+          return;
+        }
+
+        const data = await response.json();
+        resultElement.innerText = `Status: ${data.status}`;
+
+        setHealthIconFabric(data.status === "UP");
+      } catch (error) {
+        document.getElementById('result-fabric').innerText = 'Error: ' + error.message;
+        setHealthIconFabric(false);
+      }
+    }
+
+    async function requestFabricShutdown() {
+      try {
+        const response = await fetch(`/shutdown/fabric`, { method: 'GET' });
+        const resultElement = document.getElementById('result-fabric');
+
+        if (!response.ok) {
+          resultElement.innerText = `Error: ${await response.text()}`;
+          setHealthIconFabric(data.status === "UP");
+          return;
+        }
+
+        const data = await response.json();
+        resultElement.innerText = `Status: ${data.status}`;
+
+        setHealthIconFabric(data.status === "UP");
+      } catch (error) {
+        document.getElementById('result-fabric').innerText = 'Error: ' + error.message;
+        setHealthIconFabric(false);
+      }
+    }
+
+    async function requestFabricHealthCheck() {
+      try {
+        const response = await fetch(`/healthcheck/fabric`, { method: 'GET' });
+        const resultElement = document.getElementById('result-fabric');
+
+        if (!response.ok) {
+          resultElement.innerText = `Error: ${await response.text()}`;
+          setHealthIconFabric(data.status === "UP");
+          return;
+        }
+
+        const data = await response.json();
+        resultElement.innerText = `Status: ${data.status}`;
+
+        setHealthIconFabric(data.status === "UP");
+      } catch (error) {
+        document.getElementById('result-fabric').innerText = 'Error: ' + error.message;
+        setHealthIconFabric(false);
+      }
+    }
+    async function requestPostgreStart() {
+      try {
+        const response = await fetch(`/startup/postgre`, { method: 'GET' });
+        const resultElement = document.getElementById('result-postgre');
+
+        if (!response.ok) {
+          resultElement.innerText = `Error: ${await response.text()}`;
+          setHealthIconPostgre(data.status === "UP");
+          return;
+        }
+
+        const data = await response.json();
+        resultElement.innerText = `Status: ${data.status}`;
+
+        setHealthIconPostgre(data.status === "UP");
+      } catch (error) {
+        document.getElementById('result-postgre').innerText = 'Error: ' + error.message;
+        setHealthIconPostgre(false);
+      }
+    }
+
+    async function requestPostgreShutdown() {
+      try {
+        const response = await fetch(`/shutdown/postgre`, { method: 'GET' });
+        const resultElement = document.getElementById('result-postgre');
+
+        if (!response.ok) {
+          resultElement.innerText = `Error: ${await response.text()}`;
+          setHealthIconPostgre(data.status === "UP");
+          return;
+        }
+
+        const data = await response.json();
+        resultElement.innerText = `Status: ${data.status}`;
+
+        setHealthIconPostgre(data.status === "UP");
+      } catch (error) {
+        document.getElementById('result-postgre').innerText = 'Error: ' + error.message;
+        setHealthIconPostgre(false);
+      }
+    }
+
+    async function requestPostgreHealthCheck() {
+      try {
+        const response = await fetch(`/healthcheck/postgre`, { method: 'GET' });
+        const resultElement = document.getElementById('result-postgre');
+
+        if (!response.ok) {
+          resultElement.innerText = `Error: ${await response.text()}`;
+          setHealthIconPostgre(data.status === "UP");
+          return;
+        }
+
+        const data = await response.json();
+        resultElement.innerText = `Status: ${data.status}`;
+
+        setHealthIconPostgre(data.status === "UP");
+      } catch (error) {
+        document.getElementById('result-postgre').innerText = 'Error: ' + error.message;
+        setHealthIconPostgre(false);
+      }
+    }
+
+    function setHealthIconFabric(isSuccess) {
+      let iconElement = document.getElementById('health-icon-fabric');
+      if (!iconElement) {
+        iconElement = document.createElement('span');
+        iconElement.id = 'health-icon-fabric';
+        iconElement.className = 'status-icon';
+        document.getElementById('result-fabric').after(iconElement);
+      }
+      iconElement.innerText = isSuccess ? '🟢' : '🔴';
+    }
+
+    function setHealthIconPostgre(isSuccess) {
+      let iconElement = document.getElementById('health-icon-postgre');
+      if (!iconElement) {
+        iconElement = document.createElement('span');
+        iconElement.id = 'health-icon-postgre';
+        iconElement.className = 'status-icon';
+        document.getElementById('result-postgre').after(iconElement);
+      }
+      iconElement.innerText = isSuccess ? '🟢' : '🔴';
+    }
+
+    function setHealthIcon(port, isSuccess) {
+      let iconElement = document.getElementById('health-icon-' + port);
+      if (!iconElement) {
+        iconElement = document.createElement('span');
+        iconElement.id = 'health-icon-' + port;
+        iconElement.className = 'status-icon';
+        document.getElementById('result-' + port).after(iconElement);
+      }
+      iconElement.innerText = isSuccess ? '🟢' : '🔴';
+    }
+    // 페이지 열릴때 헬스체크
+    document.addEventListener('DOMContentLoaded', () => {
+      ports.forEach(port => requestServer('healthcheck', port));
+      requestFabricHealthCheck();
+      requestPostgreHealthCheck();
+    });
+  </script>
+</head>
+<body>
+<h1>Orchestrator</h1>
+<p>Server IP: <span th:text="${serverIp}"></span></p>
+
+<div id="services">
+  <h3 class="server-row">
+    <span id="health-icon-fabric" class="status-icon"></span>
+    <span class="server-name">Fabric</span>
+    <button onclick="requestFabricStart()">Start</button>
+    <button class="shutdown-btn" onclick="requestFabricShutdown()">Shutdown</button>
+    <button onclick="requestFabricHealthCheck()">Health Check</button>
+    <span id="result-fabric" class="result"></span>
+  </h3>
+
+  <h3 class="server-row">
+    <span id="health-icon-postgre" class="status-icon"></span>
+    <span class="server-name">PostgreSQL</span>
+    <button onclick="requestPostgreStart()">Start</button>
+    <button class="shutdown-btn" onclick="requestPostgreShutdown()">Shutdown</button>
+    <button onclick="requestPostgreHealthCheck()">Health Check</button>
+    <span id="result-postgre" class="result"></span>
+  </h3>
+  <script>
+    ports.forEach((port, index) => {
+      document.write(`
+       <h3 class="server-row">
+          <span id="health-icon-${port}" class="status-icon"></span>
+          <span class="server-name">${serviceNames[index]} (${port}) </span>
+          <button onclick="requestServer('startup', ${port})">Start</button>
+          <button class="shutdown-btn" onclick="requestServer('shutdown', ${port})">Shutdown</button>
+          <button onclick="requestServer('healthcheck', ${port})">Health Check</button>
+           ${port === 9001
+            ? `<button onclick="requestServer('refresh', ${port})">Refresh</button>`
+            : `<a href="http://localhost:${port}" target="_blank"><button>Settings</button></a>`}
+          <span id="result-${port}" class="result"></span>
+        </h3>
+      `);
+    });
+  </script>
+</div>
+
+<p th:text="${serviceNames[0]}"></p>
+</body>
+</html>
