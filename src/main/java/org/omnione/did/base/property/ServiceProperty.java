@@ -29,6 +29,9 @@ import java.util.Map;
 public class ServiceProperty {
     private Map<String, ServiceDetail> server;
     public String jarPath;
+    public String walletPath;
+    public String didDocPath;
+    public String cliToolPath;
     public ServiceProperty(){}
 
 //    public ServiceProperty(Map<String, ServiceDetail> services) {

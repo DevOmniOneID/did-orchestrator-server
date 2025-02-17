@@ -22,16 +22,24 @@ public interface OrchestratorService {
     //블록체인(fabric)
     String requestStartupFabric();
     String requestShutdownFabric();
-    String requestHealthCheckFabric();
+    OrchestratorDto requestHealthCheckFabric();
 
     // postgreSQL
     OrchestratorDto requestStartupPostgre();
     OrchestratorDto requestShutdownPostgre();
     OrchestratorDto requestHealthCheckPostgre();
+
     //서버
-    String requestStartup(String port);
+    OrchestratorDto requestStartup(String port);
     OrchestratorDto requestShutdown(String port);
     OrchestratorDto requestHealthCheck(String port);
     OrchestratorDto requestRefresh(String port);
+    OrchestratorDto requestStartupAll();
+    OrchestratorDto requestShutdownAll();
+
+    String createWallet(String fileName, String password);
+    String createKeys(String fileName, String password);
+    String createDidDocument(String fileName, String password, String did, String controller);
+
     String getServerIp();
 }

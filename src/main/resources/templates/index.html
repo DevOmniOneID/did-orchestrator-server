@@ -34,7 +34,7 @@
     }
 
     .server-name {
-      width: 120px;
+      width: 140px;
       display: inline-block;
       text-align: left;
     }
@@ -60,6 +60,57 @@
   <script th:inline="javascript">
     const serviceNames = [[${serviceNames}]];
     const ports = [[${servicePorts}]];
+
+    async function requestCreation(action, filename, password, did, controller) {
+      if (!filename || !password) {
+        document.getElementById('result-' + action).innerText = "파일명과 비밀번호를 입력하세요.";
+        return;
+      }
+      fetch(`/create/${action}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          filename: filename,
+          password: password,
+          did: did,
+          controller: controller
+        })
+      })
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById('result-' + action).innerText =
+                    data.success ? "생성 성공!" : `실패: ${data.message}`;
+          })
+          .catch(error => {
+            console.error("Error:", error);
+            document.getElementById('result-' + action).innerText = "생성 완료!";
+          });
+    }
+
+    async function requestAllServer(action) {
+      try {
+        const response = await fetch(`/${action}/all`, { method: 'GET' });
+        const resultElement = document.getElementById('result-all');
+
+        if (!response.ok) {
+          resultElement.innerText = `Error: ${await response.text()}`;
+          setHealthIconAll(3);
+          return;
+        }
+
+        const data = await response.json();
+        resultElement.innerText = `서버 구동 수 : ${data.cnt}`;
+
+        setHealthIconAll(data.cnt);
+        requestAllHealthCheck();
+      } catch (error) {
+        document.getElementById('result-all').innerText = 'Error: ' + error.message;
+        setHealthIconAll(3);
+      }
+    }
+
     async function requestServer(action, port) {
       if (!port) {
         alert('port is empty');
@@ -242,11 +293,31 @@
       }
       iconElement.innerText = isSuccess ? '🟢' : '🔴';
     }
+
+    function setHealthIconAll(cnt) {
+      let iconElement = document.getElementById('health-icon-all');
+      if (!iconElement) {
+        iconElement = document.createElement('span');
+        iconElement.id = 'health-icon-all';
+        iconElement.className = 'status-icon';
+        document.getElementById('result-all').after(iconElement);
+      }
+      if(cnt === 6)
+        iconElement.innerText ='🟢';
+      else if(cnt === 0)
+        iconElement.innerText ='🔴';
+      else
+        iconElement.innerText ='🟡';
+    }
+    function requestAllHealthCheck(){
+      ports.forEach(port => requestServer('healthcheck', port));
+    }
     // 페이지 열릴때 헬스체크
     document.addEventListener('DOMContentLoaded', () => {
       ports.forEach(port => requestServer('healthcheck', port));
       requestFabricHealthCheck();
       requestPostgreHealthCheck();
+      requestAllServer('healthcheck');
     });
   </script>
 </head>
@@ -255,6 +326,47 @@
 <p>Server IP: <span th:text="${serverIp}"></span></p>
 
 <div id="services">
+
+  <h3 class="server-row">
+    <span class="server-name">Wallet 생성</span>
+    <input type="text" id="filename-wallet" placeholder="파일명">
+    <input type="text" id="password-wallet" placeholder="비밀번호">
+    <button onclick="requestCreation(
+        'wallet',
+        document.getElementById('filename-wallet').value.trim(),
+        document.getElementById('password-wallet').value.trim()
+    )">생성</button>
+    <span id="result-wallet" class="result"></span>
+  </h3>
+
+  <h3 class="server-row">
+    <span class="server-name">wallet key 생성</span>
+    <input type="text" id="filename-keys" placeholder="파일명">
+    <input type="text" id="password-keys" placeholder="비밀번호">
+    <button onclick="requestCreation(
+            'keys',
+        document.getElementById('filename-keys').value.trim(),
+        document.getElementById('password-keys').value.trim()
+    )">생성</button>
+    <span id="result-keys" class="result"></span>
+  </h3>
+
+  <h3 class="server-row">
+    <span class="server-name">did 문서 생성</span>
+    <input type="text" id="filename-diddoc" placeholder="파일명">
+    <input type="text" id="password-diddoc" placeholder="비밀번호">
+    <input type="text" id="did-diddoc" placeholder="did">
+    <input type="text" id="controller-diddoc" placeholder="controller">
+    <button onclick="requestCreation(
+            'diddoc',
+        document.getElementById('filename-diddoc').value.trim(),
+        document.getElementById('password-diddoc').value.trim(),
+        document.getElementById('did-diddoc').value.trim(),
+        document.getElementById('controller-diddoc').value.trim()
+    )">생성</button>
+    <span id="result-diddoc" class="result"></span>
+  </h3>
+
   <h3 class="server-row">
     <span id="health-icon-fabric" class="status-icon"></span>
     <span class="server-name">Fabric</span>
@@ -271,6 +383,15 @@
     <button class="shutdown-btn" onclick="requestPostgreShutdown()">Shutdown</button>
     <button onclick="requestPostgreHealthCheck()">Health Check</button>
     <span id="result-postgre" class="result"></span>
+  </h3>
+
+  <h3 class="server-row">
+    <span id="health-icon-all" class="status-icon"></span>
+    <span class="server-name">All Server</span>
+    <button onclick="requestAllServer('startup')">Start</button>
+    <button class="shutdown-btn" onclick="requestAllServer('shutdown')">Shutdown</button>
+    <button onclick="requestAllHealthCheck()">Health Check</button>
+    <span id="result-all" class="result"></span>
   </h3>
   <script>
     ports.forEach((port, index) => {

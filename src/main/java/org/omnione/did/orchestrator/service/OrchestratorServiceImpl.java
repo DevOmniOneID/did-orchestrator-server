@@ -21,17 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.omnione.did.base.property.ServiceProperty;
 import org.omnione.did.orchestrator.dto.OrchestratorDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.*;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -51,6 +45,9 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     private final String JARS_DIR;
     private final Map<String, String> SERVER_JARS;
     private final Map<String, String> SERVER_JARS_FOLDER;
+    private final String WALLET_DIR;
+    private final String DID_DOC_DIR;
+    private final String CLI_TOOL_DIR;
 
     @Autowired
     public OrchestratorServiceImpl(ServiceProperty serviceProperty) {
@@ -58,6 +55,9 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         this.JARS_DIR = System.getProperty("user.dir") + serviceProperty.getJarPath();
         this.SERVER_JARS = initializeServerJars();
         this.SERVER_JARS_FOLDER = initializeServerJarsFolder();
+        this.WALLET_DIR = System.getProperty("user.dir") + serviceProperty.getWalletPath();
+        this.DID_DOC_DIR = System.getProperty("user.dir") + serviceProperty.getDidDocPath();
+        this.CLI_TOOL_DIR = System.getProperty("user.dir") + serviceProperty.getCliToolPath();
     }
 
     private Map<String, String> initializeServerJars() {
@@ -75,45 +75,195 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public String requestStartup(String port) {
+    public OrchestratorDto requestStartupAll() {
+        int cnt = 0;
+
+        OrchestratorDto response = new OrchestratorDto();
+        response.setStatus("Unknown error");
+        try {
+            for (String serverPort : SERVER_JARS.keySet()) {
+                String status = startServer(serverPort);
+                if(status.equals("UP")){
+                    cnt++;
+                }
+            }
+            response.setCnt(cnt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @Override
+    public OrchestratorDto requestShutdownAll() {
+        int cnt = 0;
+
+        OrchestratorDto response = new OrchestratorDto();
+        response.setStatus("Unknown error");
+        try {
+            for (String serverPort : SERVER_JARS.keySet()) {
+                requestShutdown(serverPort);
+                cnt++;
+
+            }
+            response.setCnt(cnt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @Override
+    public String createWallet(String fileName, String password) {
+        System.out.println("createWallet : " + fileName + " / " + password);
+        try {
+            String shellPath = System.getProperty("user.dir") + "/tool";
+            ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_wallet.sh", fileName);
+            builder.directory(new File(shellPath));
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+            Process process = builder.start();
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
+                writer.write(password);
+                writer.newLine();
+                writer.flush();
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("Wallet creation successful.");
+                return "SUCCESS";
+            } else {
+                System.err.println("Wallet creation failed.");
+                return "ERROR";
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return "ERROR";
+        }
+    }
+
+    @Override
+    public String createKeys(String fileName, String password) {
+        System.out.println("createKeys : " + fileName + " / " + password);
+        String[] keyId = {"assert", "auth", "keyagree", "invoke"};
+        try {
+            for(int i = 0; i < 4; i++) {
+                String shellPath = System.getProperty("user.dir") + "/tool";
+                ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_keys.sh", fileName + ".wallet", keyId[i]);
+                builder.directory(new File(shellPath));
+                builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+                builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+                Process process = builder.start();
+
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
+                    writer.write(password);
+                    writer.newLine();
+                    writer.flush();
+                }
+
+                int exitCode = process.waitFor();
+                if (exitCode == 0) {
+                    System.out.println("Keypair creation successful.");
+                } else {
+                    System.err.println("Keypair creation failed.");
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return "ERROR";
+        }
+        return "SUCCESS";
+    }
+
+    @Override
+    public String createDidDocument(String fileName, String password, String did, String controller) {
+        System.out.println("createDidDocument : " + fileName + " / " + password + " / " + did + " / " + controller);
+        try {
+            String shellPath = System.getProperty("user.dir") + "/tool";
+            ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_did_doc.sh", fileName + ".wallet", fileName + ".did", did, controller);
+            builder.directory(new File(shellPath));
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+            Process process = builder.start();
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
+                writer.write(password);
+                writer.newLine();
+                writer.flush();
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                System.out.println("DID Documents creation successful.");
+            } else {
+                System.err.println("DID Documents creation failed.");
+            }
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return "ERROR";
+        }
+        return "SUCCESS";
+    }
+
+    @Override
+    public OrchestratorDto requestStartup(String port) {
+        OrchestratorDto response = new OrchestratorDto();
+        response.setStatus("Unknown error");
         System.out.println("Startup request for port: " + port);
         try {
             if (port.equals("1000")) {
                 for (String serverPort : SERVER_JARS.keySet()) {
                     startServer(serverPort);
                 }
-                return "All servers are starting...";
+                response.setStatus("OrchestratorDtoAll servers are starting...");
             } else if (SERVER_JARS.containsKey(port)) {
-                startServer(port);
-                return "Server on port " + port + " is starting...";
+                response.setStatus(startServer(port));
             } else {
-                return "Invalid port number";
+                response.setStatus("Invalid port number");
             }
         }  catch (Exception e) {
             e.printStackTrace();
         }
-        return "Unknown error";
+        return response;
     }
 
     @Override
     public OrchestratorDto requestShutdown(String port) {
-        String targetUrl = getServerUrl() + port + "/actuator/shutdown";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        OrchestratorDto response = new OrchestratorDto();
+        try {
+            String targetUrl = getServerUrl() + port + "/actuator/shutdown";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
-        ResponseEntity<OrchestratorDto> response = restTemplate.postForEntity(targetUrl, requestEntity, OrchestratorDto.class);
-
-        return response.getBody();
+            HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
+            response = restTemplate.postForEntity(targetUrl, requestEntity, OrchestratorDto.class).getBody();
+            response.setStatus("DOWN");
+        } catch (Exception e) {
+            response.setStatus("ERROR");
+            return response;
+        }
+        return response;
     }
 
     @Override
     public OrchestratorDto requestHealthCheck(String port) {
-        String targetUrl = getServerUrl() + port + "/actuator/health";
-        System.out.println("target url : " + targetUrl);
+        OrchestratorDto response = new OrchestratorDto();
+        try {
+            String targetUrl = getServerUrl() + port + "/actuator/health";
+            System.out.println("target url : " + targetUrl);
 
-        ResponseEntity<OrchestratorDto> response = restTemplate.getForEntity(targetUrl, OrchestratorDto.class);
-        return response.getBody();
+            response = restTemplate.getForEntity(targetUrl, OrchestratorDto.class).getBody();
+            System.out.println("requestHealthCheck : " + response);
+        } catch (Exception e) {
+            response.setStatus("ERROR");
+            return response;
+        }
+        return response;
     }
 
     @Override
@@ -161,18 +311,27 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public String requestHealthCheckFabric() {
+    public OrchestratorDto requestHealthCheckFabric() {
         System.out.println("requestHealthCheckFabric");
+        OrchestratorDto response = new OrchestratorDto();
         try {
             String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
             ProcessBuilder builder = new ProcessBuilder("sh", fabricShellPath + "/status.sh");
             builder.directory(new File(fabricShellPath));
-            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-            builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-            builder.start();
-        } catch (IOException e) {
+            Process process = builder.start();
+            String output = getProcessOutput(process);
+
+            if (output.contains("200")) {
+                healthCheckCallback();
+                response.setStatus("UP");
+                return response;
+            }
+
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
-        } return "fabric healthcheck";
+        }
+        response.setStatus("ERROR");
+        return response;
     }
 
     @Override
@@ -186,7 +345,6 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
             Process process = builder.start();
             String output = getProcessOutput(process);
-            System.out.println("startup : " + output);
             if (output.contains("Started")) {
                 healthCheckCallback();
                 response.setStatus("UP");
@@ -210,9 +368,9 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
             Process process = builder.start();
             String output = getProcessOutput(process);
-            if (output.contains("1")) {
+            if (output.contains("stop")) {
                 healthCheckCallback();
-                response.setStatus("UP");
+                response.setStatus("DOWN");
                 return response;
             }
         } catch (IOException | InterruptedException e) {
@@ -278,14 +436,14 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return "Unknown IP";
     }
 
-    private void startServer(String port) throws IOException, InterruptedException {
+    private String startServer(String port) throws IOException, InterruptedException {
         String jarFileName = SERVER_JARS.get(port);
         String jarFolderName = SERVER_JARS_FOLDER.get(port);
         File jarFile = new File(JARS_DIR + "/" + jarFolderName + "/" + jarFileName);
 
         if (!jarFile.exists()) {
             System.err.println("JAR file not found: " + jarFile.getAbsolutePath());
-            return;
+            return "ERROR";
         }
 
         ProcessBuilder builder = new ProcessBuilder("java", "-jar", jarFile.getAbsolutePath());
@@ -293,14 +451,22 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         builder.redirectError(ProcessBuilder.Redirect.INHERIT);
         builder.start();
+//        Process process = builder.start();
+//        String output = getProcessOutput(process);
+//        System.out.println("##############################output / " + port + " : " + output);
+//        if (output.contains("Tomcat started on port " + port)) {
+//            healthCheckCallback();
+//        }
+//
+//        System.out.println("Server started on port " + port + ", waiting for health check...");
 
-        System.out.println("Server started on port " + port + ", waiting for health check...");
-
-        Thread.sleep(10000);
+        Thread.sleep(7000);
         if (isServerRunning(port)) {
             System.out.println("Server on port " + port + " is running!");
+            return "UP";
         } else {
             System.err.println("Server on port " + port + " failed to start.");
+            return "DOWN";
         }
     }
 

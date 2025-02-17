@@ -26,15 +26,15 @@ server:
   port: 9001
 
 services:
+  cliToolPath: "/tool"
   jarPath: "/jars"
+  walletPath: "/wallet"
+  didDocPath: "/DIDDoc"
   server:
-    all:
-      name: "All Server"
-      port: 1000
     tas:
       name: "TAS"
       port: 8090
-      file: "did-tas-server-1.0.0.jar"
+      file: "did-ta-server-1.0.0.jar"
     issuer:
       name: "Issuer"
       port: 8091
@@ -59,6 +59,3 @@ services:
       name: "Demo"
       port: 8099
       file: "did-demo-server-1.0.0.jar"
-    orchestrator:
-      name: "Orchestrator"
-      port: 9001

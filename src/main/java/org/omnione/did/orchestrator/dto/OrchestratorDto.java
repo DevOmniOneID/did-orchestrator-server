@@ -26,4 +26,5 @@ import lombok.*;
 @Builder
 public class OrchestratorDto {
     private String status;
+    private int cnt;
 }
