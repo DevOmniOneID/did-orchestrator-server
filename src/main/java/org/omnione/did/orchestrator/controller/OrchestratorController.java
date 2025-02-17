@@ -149,14 +149,15 @@ public class OrchestratorController {
     }
 
     @GetMapping("/startup/fabric")
-    public ResponseEntity<String> fabricStartup() {
+    public ResponseEntity<OrchestratorDto> fabricStartup() {
         try {
-            String response = orchestratorService.requestStartupFabric();
+            OrchestratorDto response = orchestratorService.requestStartupFabric();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error");
 
-            String errorResponse = "ERROR";
+            OrchestratorDto errorResponse = new OrchestratorDto();
+            errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }

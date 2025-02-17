@@ -74,6 +74,10 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return serverJarsFolder;
     }
 
+    interface FabricStartupCallback {
+        void onStartupComplete();
+        void onStartupFailed();
+    }
     @Override
     public OrchestratorDto requestStartupAll() {
         int cnt = 0;
@@ -277,22 +281,73 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
         return response.getBody();
     }
-
-
     @Override
-    public String requestStartupFabric() {
+    public OrchestratorDto requestStartupFabric() {
         System.out.println("requestStartupFabric");
+        OrchestratorDto response = new OrchestratorDto();
         try {
             String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
-            ProcessBuilder builder = new ProcessBuilder("sh", fabricShellPath + "/start.sh");
+            String logFilePath = fabricShellPath + "/fabric.log";
+
+            ProcessBuilder builder = new ProcessBuilder(
+                    "sh", "-c", "nohup " + fabricShellPath + "/start.sh > " + logFilePath + " 2>&1 &"
+            );
             builder.directory(new File(fabricShellPath));
             builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.redirectError(ProcessBuilder.Redirect.INHERIT);
             builder.start();
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } return "fabric startup";
+            watchFabricLogs(logFilePath, new FabricStartupCallback() {
+                @Override
+                public void onStartupComplete() {
+                    System.out.println("Hyperledger Fabric is running successfully!");
+                }
+                @Override
+                public void onStartupFailed() {
+                    System.out.println("Fabric startup failed.");
+                }
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Fabric startup error: " + e.getMessage());
+        }
+        response.setStatus("UP");
+        return response;
+    }
+
+    private void watchFabricLogs(String logFilePath, FabricStartupCallback callback) {
+        File logFile = new File(logFilePath);
+        System.out.println("Monitoring log file: " + logFilePath);
+
+        try {
+            while (!logFile.exists() || logFile.length() == 0) {
+                System.out.println("Waiting for log file to be created...");
+                Thread.sleep(3000);
+            }
+
+            long lastReadPosition = 0;
+            while (true) {
+                try (RandomAccessFile reader = new RandomAccessFile(logFile, "r")) {
+                    reader.seek(lastReadPosition);
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println(line);
+
+                        if (line.contains("Chaincode initialization is not required")) {
+                            callback.onStartupComplete();
+                            return;
+                        }
+                    }
+                    lastReadPosition = reader.getFilePointer();
+                }
+                Thread.sleep(3000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Log monitoring error: " + e.getMessage());
+            callback.onStartupFailed();
+        }
     }
 
     @Override

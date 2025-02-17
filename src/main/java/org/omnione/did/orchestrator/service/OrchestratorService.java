@@ -20,7 +20,7 @@ import org.omnione.did.orchestrator.dto.OrchestratorDto;
 
 public interface OrchestratorService {
     //블록체인(fabric)
-    String requestStartupFabric();
+    OrchestratorDto requestStartupFabric();
     String requestShutdownFabric();
     OrchestratorDto requestHealthCheckFabric();
 

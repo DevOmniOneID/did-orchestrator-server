@@ -314,10 +314,10 @@
     }
     // 페이지 열릴때 헬스체크
     document.addEventListener('DOMContentLoaded', () => {
-      ports.forEach(port => requestServer('healthcheck', port));
-      requestFabricHealthCheck();
-      requestPostgreHealthCheck();
-      requestAllServer('healthcheck');
+      // ports.forEach(port => requestServer('healthcheck', port));
+      // requestFabricHealthCheck();
+      // requestPostgreHealthCheck();
+      // requestAllServer('healthcheck');
     });
   </script>
 </head>
@@ -368,7 +368,7 @@
   </h3>
 
   <h3 class="server-row">
-    <span id="health-icon-fabric" class="status-icon"></span>
+    <span id="health-icon-fabric" class="status-icon">⚪</span>
     <span class="server-name">Fabric</span>
     <button onclick="requestFabricStart()">Start</button>
     <button class="shutdown-btn" onclick="requestFabricShutdown()">Shutdown</button>
@@ -377,7 +377,7 @@
   </h3>
 
   <h3 class="server-row">
-    <span id="health-icon-postgre" class="status-icon"></span>
+    <span id="health-icon-postgre" class="status-icon">⚪</span>
     <span class="server-name">PostgreSQL</span>
     <button onclick="requestPostgreStart()">Start</button>
     <button class="shutdown-btn" onclick="requestPostgreShutdown()">Shutdown</button>
@@ -386,7 +386,7 @@
   </h3>
 
   <h3 class="server-row">
-    <span id="health-icon-all" class="status-icon"></span>
+    <span id="health-icon-all" class="status-icon">⚪</span>
     <span class="server-name">All Server</span>
     <button onclick="requestAllServer('startup')">Start</button>
     <button class="shutdown-btn" onclick="requestAllServer('shutdown')">Shutdown</button>
@@ -397,7 +397,7 @@
     ports.forEach((port, index) => {
       document.write(`
        <h3 class="server-row">
-          <span id="health-icon-${port}" class="status-icon"></span>
+          <span id="health-icon-${port}" class="status-icon">⚪</span>
           <span class="server-name">${serviceNames[index]} (${port}) </span>
           <button onclick="requestServer('startup', ${port})">Start</button>
           <button class="shutdown-btn" onclick="requestServer('shutdown', ${port})">Shutdown</button>
