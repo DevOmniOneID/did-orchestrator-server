@@ -25,6 +25,16 @@ management:
 server:
   port: 9001
 
+blockchain:
+  channel: mychannel
+  chaincodeName: opendid
+
+database:
+  port: 5430
+  user: omn
+  password: omn
+  db: omn
+
 services:
   cliToolPath: "/tool"
   jarPath: "/jars"
@@ -32,30 +42,30 @@ services:
   didDocPath: "/DIDDoc"
   server:
     tas:
-      name: "TAS"
+      name: TAS
       port: 8090
-      file: "did-ta-server-1.0.0.jar"
+      file: did-ta-server-1.0.0.jar
     issuer:
-      name: "Issuer"
+      name: Issuer
       port: 8091
-      file: "did-issuer-server-1.0.0.jar"
+      file: did-issuer-server-1.0.0.jar
     verifier:
-      name: "Verifier"
+      name: Verifier
       port: 8092
-      file: "did-verifier-server-1.0.0.jar"
+      file: did-verifier-server-1.0.0.jar
     api:
-      name: "API"
+      name: API
       port: 8093
-      file: "did-api-server-1.0.0.jar"
+      file: did-api-server-1.0.0.jar
     cas:
-      name: "CAS"
+      name: CAS
       port: 8094
-      file: "did-cas-server-1.0.0.jar"
+      file: did-cas-server-1.0.0.jar
     wallet:
-      name: "WalletService"
+      name: WalletService
       port: 8095
-      file: "did-wallet-server-1.0.0.jar"
+      file: did-wallet-server-1.0.0.jar
     demo:
-      name: "Demo"
+      name: Demo
       port: 8099
-      file: "did-demo-server-1.0.0.jar"
+      file: did-demo-server-1.0.0.jar

@@ -21,7 +21,7 @@ import org.omnione.did.orchestrator.dto.OrchestratorDto;
 public interface OrchestratorService {
     //블록체인(fabric)
     OrchestratorDto requestStartupFabric();
-    String requestShutdownFabric();
+    OrchestratorDto requestShutdownFabric();
     OrchestratorDto requestHealthCheckFabric();
 
     // postgreSQL
@@ -34,8 +34,9 @@ public interface OrchestratorService {
     OrchestratorDto requestShutdown(String port);
     OrchestratorDto requestHealthCheck(String port);
     OrchestratorDto requestRefresh(String port);
-    OrchestratorDto requestStartupAll();
-    OrchestratorDto requestShutdownAll();
+    void requestStartupAll();
+    void requestShutdownAll();
+    OrchestratorDto requestHealthCheckAll();
 
     String createWallet(String fileName, String password);
     String createKeys(String fileName, String password);

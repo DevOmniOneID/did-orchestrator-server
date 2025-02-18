@@ -59,28 +59,27 @@ public class OrchestratorController {
     }
     @GetMapping("/startup/all")
     public ResponseEntity<OrchestratorDto> startupAll() {
+        OrchestratorDto response = new OrchestratorDto();
         try {
-            OrchestratorDto response = orchestratorService.requestStartupAll();
-            System.out.println("cnt : " + response.getCnt());
+            orchestratorService.requestStartupAll();
+            response.setStatus("SUCCESS");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-
-            OrchestratorDto errorResponse = new OrchestratorDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
 
     }
 
     @GetMapping("/shutdown/all")
     public ResponseEntity<OrchestratorDto> shutdownAll() {
+        OrchestratorDto response = new OrchestratorDto();
         try {
-            OrchestratorDto response = orchestratorService.requestShutdownAll();
+            orchestratorService.requestShutdownAll();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            OrchestratorDto errorResponse = new OrchestratorDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
     }
 
@@ -163,14 +162,15 @@ public class OrchestratorController {
     }
 
     @GetMapping("/shutdown/fabric")
-    public ResponseEntity<String> fabricShutdown() {
+    public ResponseEntity<OrchestratorDto> fabricShutdown() {
         try {
-            String response = orchestratorService.requestShutdownFabric();
+            OrchestratorDto response = orchestratorService.requestShutdownFabric();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error");
 
-            String errorResponse = "ERROR";
+            OrchestratorDto errorResponse = new OrchestratorDto();
+            errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }

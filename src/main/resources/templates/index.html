@@ -310,6 +310,8 @@
         iconElement.innerText ='🟡';
     }
     function requestAllHealthCheck(){
+      requestFabricHealthCheck();
+      requestPostgreHealthCheck();
       ports.forEach(port => requestServer('healthcheck', port));
     }
     // 페이지 열릴때 헬스체크
@@ -368,6 +370,15 @@
   </h3>
 
   <h3 class="server-row">
+    <span id="health-icon-all" class="status-icon">⚪</span>
+    <span class="server-name">All Entities</span>
+    <button onclick="requestAllServer('startup')">Start</button>
+    <button class="shutdown-btn" onclick="requestAllServer('shutdown')">Shutdown</button>
+    <button onclick="requestAllHealthCheck()">Health Check</button>
+    <span id="result-all" class="result"></span>
+  </h3>
+
+  <h3 class="server-row">
     <span id="health-icon-fabric" class="status-icon">⚪</span>
     <span class="server-name">Fabric</span>
     <button onclick="requestFabricStart()">Start</button>
@@ -385,14 +396,6 @@
     <span id="result-postgre" class="result"></span>
   </h3>
 
-  <h3 class="server-row">
-    <span id="health-icon-all" class="status-icon">⚪</span>
-    <span class="server-name">All Server</span>
-    <button onclick="requestAllServer('startup')">Start</button>
-    <button class="shutdown-btn" onclick="requestAllServer('shutdown')">Shutdown</button>
-    <button onclick="requestAllHealthCheck()">Health Check</button>
-    <span id="result-all" class="result"></span>
-  </h3>
   <script>
     ports.forEach((port, index) => {
       document.write(`
