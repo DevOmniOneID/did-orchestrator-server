@@ -26,7 +26,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.Yaml;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -281,4 +283,17 @@ public class OrchestratorController {
         );
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/configs/update")
+    public ResponseEntity<OrchestratorResponseDto> updateYaml(@RequestBody Map<String, Object> updates) {
+        try {
+            OrchestratorResponseDto response = orchestratorService.updateConfig(updates);
+            return ResponseEntity.ok(response);
+        } catch (Exception e){
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
+            errorResponse.setStatus("ERROR");
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
 }

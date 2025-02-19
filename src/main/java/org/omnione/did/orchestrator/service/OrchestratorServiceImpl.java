@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.net.*;
@@ -53,6 +55,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     private final String WALLET_DIR;
     private final String DID_DOC_DIR;
     private final String CLI_TOOL_DIR;
+    private final String YAML_FILE_PATH;
 
     @Autowired
     public OrchestratorServiceImpl(ServicesProperties servicesProperties, BlockchainProperties blockChainProperties, DatabaseProperties databaseProperties) {
@@ -60,6 +63,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         this.blockChainProperties = blockChainProperties;
         this.databaseProperties = databaseProperties;
         this.JARS_DIR = System.getProperty("user.dir") + servicesProperties.getJarPath();
+        this.YAML_FILE_PATH = System.getProperty("user.dir") + "/configs/application.yml";
         this.SERVER_JARS = initializeServerJars();
         this.SERVER_JARS_FOLDER = initializeServerJarsFolder();
         this.WALLET_DIR = System.getProperty("user.dir") + servicesProperties.getWalletPath();
@@ -520,6 +524,56 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             e.printStackTrace();
         }
         return "Unknown IP";
+    }
+
+    @Override
+    public OrchestratorResponseDto updateConfig(Map<String, Object> updates) {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        options.setPrettyFlow(true);
+
+        Yaml yaml = new Yaml(options);
+        Map<String, Object> yamlData = new HashMap<>();
+        response.setStatus("SUCCESS");
+
+        try (InputStream inputStream = new FileInputStream(YAML_FILE_PATH)) {
+            Map<String, Object> loaded = yaml.load(inputStream);
+            if (loaded != null) {
+                yamlData = loaded;
+            }
+        } catch (IOException e) {
+            response.setStatus("YAML 파일 읽기 오류: " + e.getMessage());
+        }
+
+        mergeMaps(yamlData, updates);
+
+        try (Writer writer = new FileWriter(YAML_FILE_PATH)) {
+            yaml.dump(yamlData, writer);
+        } catch (IOException e) {
+            response.setStatus("YAML 파일 쓰기 오류: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void mergeMaps(Map<String, Object> originalMap, Map<String, Object> updateMap) {
+        for (Map.Entry<String, Object> entry : updateMap.entrySet()) {
+            String key = entry.getKey();
+            Object updateValue = entry.getValue();
+            if (originalMap.containsKey(key)) {
+                Object originalValue = originalMap.get(key);
+                if (originalValue instanceof Map && updateValue instanceof Map) {
+                    mergeMaps((Map<String, Object>) originalValue, (Map<String, Object>) updateValue);
+                } else {
+                    originalMap.put(key, updateValue);
+                }
+            } else {
+                originalMap.put(key, updateValue);
+            }
+        }
     }
 
     private String startServer(String port) throws IOException, InterruptedException {

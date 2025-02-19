@@ -19,6 +19,7 @@ package org.omnione.did.orchestrator.service;
 import org.omnione.did.orchestrator.dto.OrchestratorResponseDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OrchestratorService {
     //블록체인(fabric)
@@ -45,4 +46,6 @@ public interface OrchestratorService {
     OrchestratorResponseDto createDidDocument(String fileName, String password, String did, String controller, String type);
 
     String getServerIp();
+    OrchestratorResponseDto updateConfig(Map<String, Object> updates);
+
 }
