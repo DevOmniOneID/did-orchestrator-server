@@ -149,20 +149,6 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
     @Override
     public OrchestratorResponseDto requestShutdown(String port) {
-//        OrchestratorDto response = new OrchestratorDto();
-//        try {
-//            String targetUrl = getServerUrl() + port + "/actuator/shutdown";
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//            HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
-//            response = restTemplate.postForEntity(targetUrl, requestEntity, OrchestratorDto.class).getBody();
-//            response.setStatus("DOWN");
-//        } catch (Exception e) {
-//            response.setStatus("ERROR");
-//            return response;
-//        }
-//        return response;
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("Unknown error");
         System.out.println("Startup request for port: " + port);
@@ -195,9 +181,13 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
-        ResponseEntity<OrchestratorResponseDto> response = restTemplate.postForEntity(targetUrl, requestEntity, OrchestratorResponseDto.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(targetUrl, requestEntity, String.class);
 
-        return response.getBody();
+        String responseBody = response.getBody();
+        System.out.println("refresh : " + responseBody);
+        OrchestratorResponseDto dto = new OrchestratorResponseDto();
+        dto.setStatus("SUCCESS");
+        return dto;
     }
     @Override
     public OrchestratorResponseDto requestStartupFabric() {
