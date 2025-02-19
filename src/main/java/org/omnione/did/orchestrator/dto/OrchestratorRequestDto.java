@@ -18,13 +18,19 @@ package org.omnione.did.orchestrator.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Builder
-public class OrchestratorDto {
-    private String status;
-    private int cnt;
+public class OrchestratorRequestDto {
+    private String filename;
+    private String password;
+    private String did;
+    private String controller;
+    private List<String> keyIds;
+    private String type;
 }

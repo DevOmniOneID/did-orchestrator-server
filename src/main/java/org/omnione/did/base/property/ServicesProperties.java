@@ -24,9 +24,24 @@ import java.util.Map;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "blockchain")
-public class BlockChainProperty {
-    public String channel;
-    public String chaincodeName;
+@ConfigurationProperties(prefix = "services")
+public class ServicesProperties {
+    private Map<String, ServiceDetail> server;
+    public String jarPath;
+    public String walletPath;
+    public String didDocPath;
+    public String cliToolPath;
+    public ServicesProperties(){}
 
+//    public ServiceProperty(Map<String, ServiceDetail> services) {
+//        this.services = services;
+//    }
+
+    @Getter
+    @Setter
+    public static class ServiceDetail {
+        private String name;
+        private int port;
+        private String file;
+    }
 }

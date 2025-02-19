@@ -19,30 +19,14 @@ package org.omnione.did.base.property;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "services")
-public class ServiceProperty {
-    private Map<String, ServiceDetail> server;
-    public String jarPath;
-    public String walletPath;
-    public String didDocPath;
-    public String cliToolPath;
-    public ServiceProperty(){}
+@ConfigurationProperties(prefix = "database")
+public class DatabaseProperties {
+    public String port;
+    public String user;
+    public String password;
+    public String db;
 
-//    public ServiceProperty(Map<String, ServiceDetail> services) {
-//        this.services = services;
-//    }
-
-    @Getter
-    @Setter
-    public static class ServiceDetail {
-        private String name;
-        private int port;
-        private String file;
-    }
 }

@@ -22,11 +22,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "database")
-public class DBProperty {
-    public String port;
-    public String user;
-    public String password;
-    public String db;
+@ConfigurationProperties(prefix = "blockchain")
+public class BlockchainProperties {
+    public String channel;
+    public String chaincodeName;
 
 }

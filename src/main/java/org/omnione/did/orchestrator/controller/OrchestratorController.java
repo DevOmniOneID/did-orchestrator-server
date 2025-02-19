@@ -16,9 +16,11 @@
 
 package org.omnione.did.orchestrator.controller;
 
-import org.omnione.did.base.property.ServiceProperty;
-import org.omnione.did.orchestrator.dto.OrchestratorDto;
-import org.omnione.did.orchestrator.dto.RequestDto;
+import org.omnione.did.base.property.ConfigProperties;
+import org.omnione.did.base.property.ServicesProperties;
+import org.omnione.did.orchestrator.dto.OrchestratorConfigDto;
+import org.omnione.did.orchestrator.dto.OrchestratorResponseDto;
+import org.omnione.did.orchestrator.dto.OrchestratorRequestDto;
 import org.omnione.did.orchestrator.service.OrchestratorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,28 +28,31 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
 public class OrchestratorController {
-    private final ServiceProperty serviceProperty;
+    private final ConfigProperties configProperties;
+    private final ServicesProperties servicesProperties;
     private final OrchestratorService orchestratorService;
 
-    public OrchestratorController(ServiceProperty serviceProperty, OrchestratorService orchestratorService) {
-        this.serviceProperty = serviceProperty;
+    public OrchestratorController(ServicesProperties servicesProperties, OrchestratorService orchestratorService, ConfigProperties configProperties) {
+        this.servicesProperties = servicesProperties;
         this.orchestratorService = orchestratorService;
 
+        this.configProperties = configProperties;
     }
 
     @GetMapping("/")
     public String index(Model model) {
 
-        List<String> serviceNames = serviceProperty.getServer().values().stream()
-                .map(ServiceProperty.ServiceDetail::getName)
+        List<String> serviceNames = servicesProperties.getServer().values().stream()
+                .map(ServicesProperties.ServiceDetail::getName)
                 .collect(Collectors.toList());
 
-        List<Integer> servicePorts = serviceProperty.getServer().values().stream()
-                .map(ServiceProperty.ServiceDetail::getPort)
+        List<Integer> servicePorts = servicesProperties.getServer().values().stream()
+                .map(ServicesProperties.ServiceDetail::getPort)
                 .collect(Collectors.toList());
 
         model.addAttribute("serviceNames", serviceNames);
@@ -58,8 +63,8 @@ public class OrchestratorController {
         return "index";
     }
     @GetMapping("/startup/all")
-    public ResponseEntity<OrchestratorDto> startupAll() {
-        OrchestratorDto response = new OrchestratorDto();
+    public ResponseEntity<OrchestratorResponseDto> startupAll() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             orchestratorService.requestStartupAll();
             response.setStatus("SUCCESS");
@@ -72,8 +77,8 @@ public class OrchestratorController {
     }
 
     @GetMapping("/shutdown/all")
-    public ResponseEntity<OrchestratorDto> shutdownAll() {
-        OrchestratorDto response = new OrchestratorDto();
+    public ResponseEntity<OrchestratorResponseDto> shutdownAll() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             orchestratorService.requestShutdownAll();
             return ResponseEntity.ok(response);
@@ -84,15 +89,15 @@ public class OrchestratorController {
     }
 
     @GetMapping("/startup/{port}")
-    public ResponseEntity<OrchestratorDto> startup(@PathVariable String port) {
+    public ResponseEntity<OrchestratorResponseDto> startup(@PathVariable String port) {
         System.out.println("health check port : " + port);
         try {
-            OrchestratorDto response = orchestratorService.requestStartup(port);
+            OrchestratorResponseDto response = orchestratorService.requestStartup(port);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error: " + port);
 
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
@@ -100,147 +105,180 @@ public class OrchestratorController {
     }
 
     @GetMapping("/shutdown/{port}")
-    public ResponseEntity<OrchestratorDto> shutdown(@PathVariable String port) {
+    public ResponseEntity<OrchestratorResponseDto> shutdown(@PathVariable String port) {
         // shutdown post 요청
         System.out.println("shutdown check port : " + port);
         try {
-            OrchestratorDto response = orchestratorService.requestShutdown(port);
+            OrchestratorResponseDto response = orchestratorService.requestShutdown(port);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error: " + port);
 
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @GetMapping("/healthcheck/{port}")
-    public ResponseEntity<OrchestratorDto> healthCheck(@PathVariable String port) {
+    public ResponseEntity<OrchestratorResponseDto> healthCheck(@PathVariable String port) {
         // healthcheck는 get 요청
         System.out.println("health check port : " + port);
         try {
-            OrchestratorDto response = orchestratorService.requestHealthCheck(port);
+            OrchestratorResponseDto response = orchestratorService.requestHealthCheck(port);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error: " + port);
 
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @GetMapping("/refresh/{port}")
-    public ResponseEntity<OrchestratorDto> refresh(@PathVariable String port) {
+    public ResponseEntity<OrchestratorResponseDto> refresh(@PathVariable String port) {
         // refresh post 요청
         System.out.println("refresh check port : " + port);
         try {
-            OrchestratorDto response = orchestratorService.requestRefresh(port);
+            OrchestratorResponseDto response = orchestratorService.requestRefresh(port);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error");
 
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @GetMapping("/startup/fabric")
-    public ResponseEntity<OrchestratorDto> fabricStartup() {
+    public ResponseEntity<OrchestratorResponseDto> fabricStartup() {
         try {
-            OrchestratorDto response = orchestratorService.requestStartupFabric();
+            OrchestratorResponseDto response = orchestratorService.requestStartupFabric();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error");
 
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @GetMapping("/shutdown/fabric")
-    public ResponseEntity<OrchestratorDto> fabricShutdown() {
+    public ResponseEntity<OrchestratorResponseDto> fabricShutdown() {
         try {
-            OrchestratorDto response = orchestratorService.requestShutdownFabric();
+            OrchestratorResponseDto response = orchestratorService.requestShutdownFabric();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error");
 
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @GetMapping("/healthcheck/fabric")
-    public ResponseEntity<OrchestratorDto> fabricHealthCheck() {
+    public ResponseEntity<OrchestratorResponseDto> fabricHealthCheck() {
         try {
-            OrchestratorDto response = orchestratorService.requestHealthCheckFabric();
+            OrchestratorResponseDto response = orchestratorService.requestHealthCheckFabric();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             System.out.println("response error");
 
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @GetMapping("/startup/postgre")
-    public ResponseEntity<OrchestratorDto> postgreStartup() {
+    public ResponseEntity<OrchestratorResponseDto> postgreStartup() {
         try {
-            OrchestratorDto response = orchestratorService.requestStartupPostgre();
+            OrchestratorResponseDto response = orchestratorService.requestStartupPostgre();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @GetMapping("/shutdown/postgre")
-    public ResponseEntity<OrchestratorDto> postgreShutdown() {
+    public ResponseEntity<OrchestratorResponseDto> postgreShutdown() {
         try {
-            OrchestratorDto response = orchestratorService.requestShutdownPostgre();
+            OrchestratorResponseDto response = orchestratorService.requestShutdownPostgre();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @GetMapping("/healthcheck/postgre")
-    public ResponseEntity<OrchestratorDto> postgreHealthCheck() {
+    public ResponseEntity<OrchestratorResponseDto> postgreHealthCheck() {
         try {
-            OrchestratorDto response = orchestratorService.requestHealthCheckPostgre();
+            OrchestratorResponseDto response = orchestratorService.requestHealthCheckPostgre();
             System.out.println("postgre response : " + response.getStatus());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            OrchestratorDto errorResponse = new OrchestratorDto();
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
             errorResponse.setStatus("ERROR");
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
     @PostMapping("/create/wallet")
-    public ResponseEntity<String> createWallet(@RequestBody RequestDto request) {
-        String result = orchestratorService.createWallet(request.getFilename(), request.getPassword());
-        return ResponseEntity.ok(result);
-    }
-    @PostMapping("/create/diddoc")
-    public ResponseEntity<String> createDidDocument(@RequestBody RequestDto request) {
-        String result = orchestratorService.createDidDocument(request.getFilename(), request.getPassword(), request.getDid(), request.getController());
-        return ResponseEntity.ok(result);
+    public ResponseEntity<OrchestratorResponseDto> createWallet(@RequestBody OrchestratorRequestDto request) {
+        try{
+            OrchestratorResponseDto result = orchestratorService.createWallet(request.getFilename(), request.getPassword());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
+            errorResponse.setStatus("ERROR");
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 
     @PostMapping("/create/keys")
-    public ResponseEntity<String> createWalletKeys(@RequestBody RequestDto request) {
-        String result = orchestratorService.createKeys(request.getFilename(), request.getPassword());
-        return ResponseEntity.ok(result);
+    public ResponseEntity<OrchestratorResponseDto> createWalletKeys(@RequestBody OrchestratorRequestDto request) {
+        List<String> keyIds = request.getKeyIds();
+        if (keyIds == null || keyIds.isEmpty()) {
+            throw new IllegalArgumentException("keyIds cannot be null or empty");
+        }
+
+        try{
+            OrchestratorResponseDto result = orchestratorService.createKeys(request.getFilename(), request.getPassword(), keyIds);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
+            errorResponse.setStatus("ERROR");
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 
+    @PostMapping("/create/diddoc")
+    public ResponseEntity<OrchestratorResponseDto> createDidDocument(@RequestBody OrchestratorRequestDto request) {
+        try{
+            OrchestratorResponseDto result = orchestratorService.createDidDocument(request.getFilename(), request.getPassword(), request.getDid(), request.getController(), request.getType());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
+            errorResponse.setStatus("ERROR");
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/configs")
+    public ResponseEntity<OrchestratorConfigDto> getConfig() {
+        OrchestratorConfigDto response = new OrchestratorConfigDto(
+                configProperties.getBlockchain(),
+                configProperties.getDatabase(),
+                configProperties.getServices()
+        );
+        return ResponseEntity.ok(response);
+    }
 }

@@ -18,10 +18,10 @@ package org.omnione.did.orchestrator.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.omnione.did.base.property.BlockChainProperty;
-import org.omnione.did.base.property.DBProperty;
-import org.omnione.did.base.property.ServiceProperty;
-import org.omnione.did.orchestrator.dto.OrchestratorDto;
+import org.omnione.did.base.property.BlockchainProperties;
+import org.omnione.did.base.property.DatabaseProperties;
+import org.omnione.did.base.property.ServicesProperties;
+import org.omnione.did.orchestrator.dto.OrchestratorResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import java.sql.Connection;
@@ -43,9 +44,9 @@ import java.sql.Connection;
 @Service
 public class OrchestratorServiceImpl implements OrchestratorService{
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ServiceProperty serviceProperty;
-    private final BlockChainProperty blockChainProperty;
-    private final DBProperty dbProperty;
+    private final ServicesProperties servicesProperties;
+    private final BlockchainProperties blockChainProperties;
+    private final DatabaseProperties databaseProperties;
     private final String JARS_DIR;
     private final Map<String, String> SERVER_JARS;
     private final Map<String, String> SERVER_JARS_FOLDER;
@@ -54,28 +55,28 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     private final String CLI_TOOL_DIR;
 
     @Autowired
-    public OrchestratorServiceImpl(ServiceProperty serviceProperty, BlockChainProperty blockChainProperty, DBProperty dbProperty) {
-        this.serviceProperty = serviceProperty;
-        this.blockChainProperty = blockChainProperty;
-        this.dbProperty = dbProperty;
-        this.JARS_DIR = System.getProperty("user.dir") + serviceProperty.getJarPath();
+    public OrchestratorServiceImpl(ServicesProperties servicesProperties, BlockchainProperties blockChainProperties, DatabaseProperties databaseProperties) {
+        this.servicesProperties = servicesProperties;
+        this.blockChainProperties = blockChainProperties;
+        this.databaseProperties = databaseProperties;
+        this.JARS_DIR = System.getProperty("user.dir") + servicesProperties.getJarPath();
         this.SERVER_JARS = initializeServerJars();
         this.SERVER_JARS_FOLDER = initializeServerJarsFolder();
-        this.WALLET_DIR = System.getProperty("user.dir") + serviceProperty.getWalletPath();
-        this.DID_DOC_DIR = System.getProperty("user.dir") + serviceProperty.getDidDocPath();
-        this.CLI_TOOL_DIR = System.getProperty("user.dir") + serviceProperty.getCliToolPath();
+        this.WALLET_DIR = System.getProperty("user.dir") + servicesProperties.getWalletPath();
+        this.DID_DOC_DIR = System.getProperty("user.dir") + servicesProperties.getDidDocPath();
+        this.CLI_TOOL_DIR = System.getProperty("user.dir") + servicesProperties.getCliToolPath();
     }
 
     private Map<String, String> initializeServerJars() {
         Map<String, String> serverJars = new HashMap<>();
-        serviceProperty.getServer().forEach((key, serverDetail) ->
+        servicesProperties.getServer().forEach((key, serverDetail) ->
                 serverJars.put(String.valueOf(serverDetail.getPort()), serverDetail.getFile()));
         return serverJars;
     }
 
     private Map<String, String> initializeServerJarsFolder() {
         Map<String, String> serverJarsFolder = new HashMap<>();
-        serviceProperty.getServer().forEach((key, serverDetail) ->
+        servicesProperties.getServer().forEach((key, serverDetail) ->
                 serverJarsFolder.put(String.valueOf(serverDetail.getPort()), serverDetail.getName()));
         return serverJarsFolder;
     }
@@ -115,8 +116,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public OrchestratorDto requestHealthCheckAll() {
-        OrchestratorDto response = new OrchestratorDto();
+    public OrchestratorResponseDto requestHealthCheckAll() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("Unknown error");
         try {
             for (String serverPort : SERVER_JARS.keySet()) {
@@ -130,8 +131,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
 
     @Override
-    public OrchestratorDto requestStartup(String port) {
-        OrchestratorDto response = new OrchestratorDto();
+    public OrchestratorResponseDto requestStartup(String port) {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("Unknown error");
         System.out.println("Startup request for port: " + port);
         try {
@@ -143,7 +144,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public OrchestratorDto requestShutdown(String port) {
+    public OrchestratorResponseDto requestShutdown(String port) {
 //        OrchestratorDto response = new OrchestratorDto();
 //        try {
 //            String targetUrl = getServerUrl() + port + "/actuator/shutdown";
@@ -158,7 +159,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 //            return response;
 //        }
 //        return response;
-        OrchestratorDto response = new OrchestratorDto();
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("Unknown error");
         System.out.println("Startup request for port: " + port);
         try {
@@ -170,8 +171,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public OrchestratorDto requestHealthCheck(String port) {
-        OrchestratorDto response = new OrchestratorDto();
+    public OrchestratorResponseDto requestHealthCheck(String port) {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("DOWN");
         System.out.println("requestHealthCheck for port: " + port);
         try {
@@ -183,42 +184,25 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
-//    @Override
-//    public OrchestratorDto requestHealthCheck(String port) {
-//        OrchestratorDto response = new OrchestratorDto();
-//        try {
-//            String targetUrl = getServerUrl() + port + "/actuator/health";
-//            System.out.println("target url : " + targetUrl);
-//
-//            response = restTemplate.getForEntity(targetUrl, OrchestratorDto.class).getBody();
-//            System.out.println("requestHealthCheck : " + response);
-//        } catch (Exception e) {
-//            response.setStatus("ERROR");
-//            return response;
-//        }
-//        return response;
-//    }
-
     @Override
-    public OrchestratorDto requestRefresh(String port) {
+    public OrchestratorResponseDto requestRefresh(String port) {
         String targetUrl = getServerUrl() + port + "/actuator/refresh";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
-        ResponseEntity<OrchestratorDto> response = restTemplate.postForEntity(targetUrl, requestEntity, OrchestratorDto.class);
+        ResponseEntity<OrchestratorResponseDto> response = restTemplate.postForEntity(targetUrl, requestEntity, OrchestratorResponseDto.class);
 
         return response.getBody();
     }
     @Override
-    public OrchestratorDto requestStartupFabric() {
+    public OrchestratorResponseDto requestStartupFabric() {
         System.out.println("requestStartupFabric");
+        String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
+        String logFilePath = fabricShellPath + "/fabric.log";
         try {
-            String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
-            String logFilePath = fabricShellPath + "/fabric.log";
-
             ProcessBuilder builder = new ProcessBuilder(
-                    "sh", "-c", "nohup " + fabricShellPath + "/start.sh " + blockChainProperty.getChannel() + " " + blockChainProperty.getChaincodeName() +
+                    "sh", "-c", "nohup " + fabricShellPath + "/start.sh " + blockChainProperties.getChannel() + " " + blockChainProperties.getChaincodeName() +
                     " > " + logFilePath + " 2>&1 &"
             );
 
@@ -242,7 +226,20 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             e.printStackTrace();
             System.out.println("Fabric startup error: " + e.getMessage());
         }
-        OrchestratorDto response = requestHealthCheckFabric();
+
+        OrchestratorResponseDto response = requestHealthCheckFabric();
+            if(response.getStatus().equals("UP")){
+                // fabric.log 파일삭제
+                File logFile = new File(logFilePath);
+                if (logFile.exists()) {
+                    boolean deleted = logFile.delete();
+                    if (deleted) {
+                        System.out.println("Fabric log file deleted: " + logFilePath);
+                    } else {
+                        System.out.println("Failed to delete fabric.log file.");
+                    }
+                }
+            }
         return response;
     }
 
@@ -285,7 +282,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public OrchestratorDto requestShutdownFabric() {
+    public OrchestratorResponseDto requestShutdownFabric() {
         System.out.println("requestShutdownFabric");
         try {
             String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
@@ -297,17 +294,17 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        OrchestratorDto response = requestHealthCheckFabric();
+        OrchestratorResponseDto response = requestHealthCheckFabric();
         return response;
     }
 
     @Override
-    public OrchestratorDto requestHealthCheckFabric() {
+    public OrchestratorResponseDto requestHealthCheckFabric() {
         System.out.println("requestHealthCheckFabric");
-        OrchestratorDto response = new OrchestratorDto();
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
-            ProcessBuilder builder = new ProcessBuilder("sh", fabricShellPath + "/status.sh", blockChainProperty.getChannel(), blockChainProperty.getChaincodeName());
+            ProcessBuilder builder = new ProcessBuilder("sh", fabricShellPath + "/status.sh", blockChainProperties.getChannel(), blockChainProperties.getChaincodeName());
             builder.directory(new File(fabricShellPath));
             Process process = builder.start();
             String output = getProcessOutput(process);
@@ -325,12 +322,12 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public OrchestratorDto requestStartupPostgre() {
+    public OrchestratorResponseDto requestStartupPostgre() {
         System.out.println("requestStartupPostgre");
-        OrchestratorDto response = new OrchestratorDto();
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String postgreShellPath = System.getProperty("user.dir") + "/shells/Postgre";
-            ProcessBuilder builder = new ProcessBuilder("sh", postgreShellPath + "/start.sh", dbProperty.getPort(), dbProperty.getUser(), dbProperty.getPassword(), dbProperty.getDb());
+            ProcessBuilder builder = new ProcessBuilder("sh", postgreShellPath + "/start.sh", databaseProperties.getPort(), databaseProperties.getUser(), databaseProperties.getPassword(), databaseProperties.getDb());
             builder.directory(new File(postgreShellPath));
 
             Process process = builder.start();
@@ -347,9 +344,9 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public OrchestratorDto requestShutdownPostgre() {
+    public OrchestratorResponseDto requestShutdownPostgre() {
         System.out.println("requestShutdownPostgre");
-        OrchestratorDto response = new OrchestratorDto();
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String postgreShellPath = System.getProperty("user.dir") + "/shells/Postgre";
             ProcessBuilder builder = new ProcessBuilder("sh", postgreShellPath + "/stop.sh");
@@ -369,12 +366,12 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public OrchestratorDto requestHealthCheckPostgre() {
+    public OrchestratorResponseDto requestHealthCheckPostgre() {
         System.out.println("requestHealthCheckPostgre");
-        OrchestratorDto response = new OrchestratorDto();
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String postgreShellPath = System.getProperty("user.dir") + "/shells/Postgre";
-            ProcessBuilder builder = new ProcessBuilder("sh", postgreShellPath + "/status.sh", dbProperty.getUser(), dbProperty.getPassword());
+            ProcessBuilder builder = new ProcessBuilder("sh", postgreShellPath + "/status.sh", databaseProperties.getUser(), databaseProperties.getPassword());
             builder.directory(new File(postgreShellPath));
 
             Process process = builder.start();
@@ -393,8 +390,9 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
-    public String createWallet(String fileName, String password) {
+    public OrchestratorResponseDto createWallet(String fileName, String password) {
         System.out.println("createWallet : " + fileName + " / " + password);
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String shellPath = System.getProperty("user.dir") + "/tool";
             ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_wallet.sh", fileName);
@@ -412,25 +410,28 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             int exitCode = process.waitFor();
             if (exitCode == 0) {
                 System.out.println("Wallet creation successful.");
-                return "SUCCESS";
+                response.setStatus("SUCCESS");
+                return response;
             } else {
                 System.err.println("Wallet creation failed.");
-                return "ERROR";
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return "ERROR";
         }
+        response.setStatus("ERROR");
+        return response;
     }
 
     @Override
-    public String createKeys(String fileName, String password) {
+    public OrchestratorResponseDto createKeys(String fileName, String password, List<String> keyIds) {
         System.out.println("createKeys : " + fileName + " / " + password);
-        String[] keyId = {"assert", "auth", "keyagree", "invoke"};
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+//        String[] keyId = {"assert", "auth", "keyagree", "invoke"};
         try {
-            for(int i = 0; i < 4; i++) {
+            for(int i = 0; i < keyIds.size(); i++) {
+                System.out.println("createKeys : " + fileName + " / " + password + " / " + keyIds.get(i));
                 String shellPath = System.getProperty("user.dir") + "/tool";
-                ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_keys.sh", fileName + ".wallet", keyId[i]);
+                ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_keys.sh", fileName + ".wallet", keyIds.get(i));
                 builder.directory(new File(shellPath));
                 builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                 builder.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -448,21 +449,25 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                     System.out.println("Keypair creation successful.");
                 } else {
                     System.err.println("Keypair creation failed.");
+                    response.setStatus("ERROR");
+                    return response;
                 }
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return "ERROR";
+            response.setStatus("ERROR");
         }
-        return "SUCCESS";
+        response.setStatus("SUCCESS");
+        return response;
     }
 
     @Override
-    public String createDidDocument(String fileName, String password, String did, String controller) {
+    public OrchestratorResponseDto createDidDocument(String fileName, String password, String did, String controller, String type) {
         System.out.println("createDidDocument : " + fileName + " / " + password + " / " + did + " / " + controller);
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String shellPath = System.getProperty("user.dir") + "/tool";
-            ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_did_doc.sh", fileName + ".wallet", fileName + ".did", did, controller);
+            ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_did_doc.sh", fileName + ".wallet", fileName + ".did", did, controller, type);
             builder.directory(new File(shellPath));
             builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -478,15 +483,17 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             int exitCode = process.waitFor();
             if (exitCode == 0) {
                 System.out.println("DID Documents creation successful.");
+                response.setStatus("SUCCESS");
+                return response;
             } else {
                 System.err.println("DID Documents creation failed.");
             }
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return "ERROR";
         }
-        return "SUCCESS";
+        response.setStatus("ERROR");
+        return response;
     }
 
     @Override
@@ -554,7 +561,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
-        restTemplate.postForEntity(targetUrl, requestEntity, OrchestratorDto.class).getBody();
+        restTemplate.postForEntity(targetUrl, requestEntity, OrchestratorResponseDto.class).getBody();
 
         int retries = 5;
         while (retries-- > 0) {

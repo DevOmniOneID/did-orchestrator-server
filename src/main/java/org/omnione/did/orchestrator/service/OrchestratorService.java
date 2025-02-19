@@ -16,31 +16,33 @@
 
 package org.omnione.did.orchestrator.service;
 
-import org.omnione.did.orchestrator.dto.OrchestratorDto;
+import org.omnione.did.orchestrator.dto.OrchestratorResponseDto;
+
+import java.util.List;
 
 public interface OrchestratorService {
     //블록체인(fabric)
-    OrchestratorDto requestStartupFabric();
-    OrchestratorDto requestShutdownFabric();
-    OrchestratorDto requestHealthCheckFabric();
+    OrchestratorResponseDto requestStartupFabric();
+    OrchestratorResponseDto requestShutdownFabric();
+    OrchestratorResponseDto requestHealthCheckFabric();
 
     // postgreSQL
-    OrchestratorDto requestStartupPostgre();
-    OrchestratorDto requestShutdownPostgre();
-    OrchestratorDto requestHealthCheckPostgre();
+    OrchestratorResponseDto requestStartupPostgre();
+    OrchestratorResponseDto requestShutdownPostgre();
+    OrchestratorResponseDto requestHealthCheckPostgre();
 
     //서버
-    OrchestratorDto requestStartup(String port);
-    OrchestratorDto requestShutdown(String port);
-    OrchestratorDto requestHealthCheck(String port);
-    OrchestratorDto requestRefresh(String port);
+    OrchestratorResponseDto requestStartup(String port);
+    OrchestratorResponseDto requestShutdown(String port);
+    OrchestratorResponseDto requestHealthCheck(String port);
+    OrchestratorResponseDto requestRefresh(String port);
     void requestStartupAll();
     void requestShutdownAll();
-    OrchestratorDto requestHealthCheckAll();
+    OrchestratorResponseDto requestHealthCheckAll();
 
-    String createWallet(String fileName, String password);
-    String createKeys(String fileName, String password);
-    String createDidDocument(String fileName, String password, String did, String controller);
+    OrchestratorResponseDto createWallet(String fileName, String password);
+    OrchestratorResponseDto createKeys(String fileName, String password, List<String> keyIds);
+    OrchestratorResponseDto createDidDocument(String fileName, String password, String did, String controller, String type);
 
     String getServerIp();
 }

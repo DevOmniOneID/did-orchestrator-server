@@ -24,10 +24,6 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
-public class RequestDto {
-    private String filename;
-    private String password;
-    private String did;
-    private String controller;
-    private String keyId;
+public class OrchestratorResponseDto {
+    private String status;
 }
