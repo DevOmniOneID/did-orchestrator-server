@@ -194,7 +194,11 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         System.out.println("requestStartupFabric");
         String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
         String logFilePath = fabricShellPath + "/fabric.log";
+
         try {
+            ProcessBuilder chmodBuilder = new ProcessBuilder("chmod", "+x", fabricShellPath + "/start.sh");
+            chmodBuilder.start().waitFor();
+
             ProcessBuilder builder = new ProcessBuilder(
                     "sh", "-c", "nohup " + fabricShellPath + "/start.sh " + blockChainProperties.getChannel() + " " + blockChainProperties.getChaincodeName() +
                     " > " + logFilePath + " 2>&1 &"
@@ -255,11 +259,11 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                     while ((line = reader.readLine()) != null) {
                         System.out.println(line);
 
-                        if (line.contains("Chaincode initialization is not required")) {
+                        if (line.contains("Chaincode initialization is not required") || line.contains("starting checked")) {
                             callback.onStartupComplete();
                             return;
                         }
-                        if (line.contains("Deploying chaincode failed")) {
+                        if (line.contains("Deploying chaincode failed") || line.contains("Cannot connect to the Docker daemon")) {
                             callback.onStartupFailed();
                             return;
                         }
