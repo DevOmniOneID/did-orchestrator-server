@@ -20,7 +20,7 @@ ${PWD}/fabric-samples/test-network/network.sh createChannel -c $CHANNEL
 ${PWD}/fabric-samples/test-network/network.sh up -ca -s couchdb
 sleep 3
 
-command="sh ${PWD}/status.sh" $CHANNEL $CHAINCODE_NAME
+command="sh ${PWD}/status.sh $CHANNEL $CHAINCODE_NAME"
 eval $command
 
 if [ $? -eq 0 ]; then
