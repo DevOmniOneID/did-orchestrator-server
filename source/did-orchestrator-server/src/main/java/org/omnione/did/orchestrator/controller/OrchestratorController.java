@@ -16,6 +16,7 @@
 
 package org.omnione.did.orchestrator.controller;
 
+import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.property.ConfigProperties;
 import org.omnione.did.base.property.ServicesProperties;
 import org.omnione.did.orchestrator.dto.OrchestratorConfigDto;
@@ -26,9 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.yaml.snakeyaml.Yaml;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,11 +41,11 @@ public class OrchestratorController {
     public OrchestratorController(ServicesProperties servicesProperties, OrchestratorService orchestratorService, ConfigProperties configProperties) {
         this.servicesProperties = servicesProperties;
         this.orchestratorService = orchestratorService;
-
         this.configProperties = configProperties;
     }
 
-    @GetMapping("/")
+    //@GetMapping("/")
+    @GetMapping(value = {"/", "/conf"})
     public String index(Model model) {
 
         List<String> serviceNames = servicesProperties.getServer().values().stream()
@@ -62,7 +61,7 @@ public class OrchestratorController {
         // 서버 ip
         model.addAttribute("serverIp", orchestratorService.getServerIp());
 
-        return "index";
+        return "forward:/index.html";
     }
     @GetMapping("/startup/all")
     public ResponseEntity<OrchestratorResponseDto> startupAll() {
@@ -71,7 +70,7 @@ public class OrchestratorController {
             orchestratorService.requestStartupAll();
             response.setStatus("SUCCESS");
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (OpenDidException e) {
             response.setStatus("ERROR");
             return ResponseEntity.status(500).body(response);
         }
@@ -83,8 +82,9 @@ public class OrchestratorController {
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             orchestratorService.requestShutdownAll();
+            response.setStatus("SUCCESS");
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (OpenDidException e) {
             response.setStatus("ERROR");
             return ResponseEntity.status(500).body(response);
         }
@@ -92,145 +92,134 @@ public class OrchestratorController {
 
     @GetMapping("/startup/{port}")
     public ResponseEntity<OrchestratorResponseDto> startup(@PathVariable String port) {
-        System.out.println("health check port : " + port);
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("startup port : " + port);
         try {
-            OrchestratorResponseDto response = orchestratorService.requestStartup(port);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.out.println("response error: " + port);
-
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestStartup(port);
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
 
     }
 
     @GetMapping("/shutdown/{port}")
     public ResponseEntity<OrchestratorResponseDto> shutdown(@PathVariable String port) {
-        // shutdown post 요청
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
         System.out.println("shutdown check port : " + port);
         try {
-            OrchestratorResponseDto response = orchestratorService.requestShutdown(port);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.out.println("response error: " + port);
-
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestShutdown(port);
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
+
     }
 
     @GetMapping("/healthcheck/{port}")
     public ResponseEntity<OrchestratorResponseDto> healthCheck(@PathVariable String port) {
-        // healthcheck는 get 요청
-        System.out.println("health check port : " + port);
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("healthcheck port : " + port);
         try {
-            OrchestratorResponseDto response = orchestratorService.requestHealthCheck(port);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.out.println("response error: " + port);
-
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestHealthCheck(port);
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/refresh/{port}")
     public ResponseEntity<OrchestratorResponseDto> refresh(@PathVariable String port) {
-        // refresh post 요청
-        System.out.println("refresh check port : " + port);
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("refresh port : " + port);
         try {
-            OrchestratorResponseDto response = orchestratorService.requestRefresh(port);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.out.println("response error");
-
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestRefresh(port);
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/startup/fabric")
     public ResponseEntity<OrchestratorResponseDto> fabricStartup() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("fabric startup");
         try {
-            OrchestratorResponseDto response = orchestratorService.requestStartupFabric();
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.out.println("response error");
-
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestStartupFabric();
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/shutdown/fabric")
     public ResponseEntity<OrchestratorResponseDto> fabricShutdown() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("fabric shutdown");
         try {
-            OrchestratorResponseDto response = orchestratorService.requestShutdownFabric();
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.out.println("response error");
-
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestShutdownFabric();
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/healthcheck/fabric")
     public ResponseEntity<OrchestratorResponseDto> fabricHealthCheck() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("fabric health check");
         try {
-            OrchestratorResponseDto response = orchestratorService.requestHealthCheckFabric();
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.out.println("response error");
-
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestHealthCheckFabric();
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/startup/postgre")
     public ResponseEntity<OrchestratorResponseDto> postgreStartup() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("postgre startup");
         try {
-            OrchestratorResponseDto response = orchestratorService.requestStartupPostgre();
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestStartupPostgre();
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/shutdown/postgre")
     public ResponseEntity<OrchestratorResponseDto> postgreShutdown() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("postgre shutdown");
         try {
-            OrchestratorResponseDto response = orchestratorService.requestShutdownPostgre();
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestShutdownPostgre();
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/healthcheck/postgre")
     public ResponseEntity<OrchestratorResponseDto> postgreHealthCheck() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("postgre health check");
         try {
-            OrchestratorResponseDto response = orchestratorService.requestHealthCheckPostgre();
-            System.out.println("postgre response : " + response.getStatus());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
-            errorResponse.setStatus("ERROR");
-            return ResponseEntity.status(500).body(errorResponse);
+            response = orchestratorService.requestHealthCheckPostgre();
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
         }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/create/wallet")
@@ -284,7 +273,7 @@ public class OrchestratorController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/configs/update")
+    @PostMapping("/configs")
     public ResponseEntity<OrchestratorResponseDto> updateYaml(@RequestBody Map<String, Object> updates) {
         try {
             OrchestratorResponseDto response = orchestratorService.updateConfig(updates);
@@ -295,5 +284,23 @@ public class OrchestratorController {
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
+    //test
+    @GetMapping("/test")
+    public String test(Model model) {
 
+        List<String> serviceNames = servicesProperties.getServer().values().stream()
+                .map(ServicesProperties.ServiceDetail::getName)
+                .collect(Collectors.toList());
+
+        List<Integer> servicePorts = servicesProperties.getServer().values().stream()
+                .map(ServicesProperties.ServiceDetail::getPort)
+                .collect(Collectors.toList());
+
+        model.addAttribute("serviceNames", serviceNames);
+        model.addAttribute("servicePorts", servicePorts);
+        // 서버 ip
+        model.addAttribute("serverIp", orchestratorService.getServerIp());
+
+        return "test";
+    }
 }

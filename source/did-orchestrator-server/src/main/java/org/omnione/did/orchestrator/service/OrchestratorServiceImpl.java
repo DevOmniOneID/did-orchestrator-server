@@ -18,6 +18,8 @@ package org.omnione.did.orchestrator.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.omnione.did.base.exception.ErrorCode;
+import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.property.BlockchainProperties;
 import org.omnione.did.base.property.DatabaseProperties;
 import org.omnione.did.base.property.ServicesProperties;
@@ -99,8 +101,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                     System.out.println("Server on port " + serverPort + " is already running. Skipping startup.");
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
     }
 
@@ -114,8 +116,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                     System.out.println("Server on port " + serverPort + " is stop. Skipping shutdown.");
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
     }
 
@@ -135,27 +137,27 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
 
     @Override
-    public OrchestratorResponseDto requestStartup(String port) {
+    public OrchestratorResponseDto requestStartup(String port) throws OpenDidException {
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("Unknown error");
         System.out.println("Startup request for port: " + port);
         try {
             response.setStatus(startServer(port));
-        }  catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         return response;
     }
 
     @Override
-    public OrchestratorResponseDto requestShutdown(String port) {
+    public OrchestratorResponseDto requestShutdown(String port) throws OpenDidException {
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("Unknown error");
-        System.out.println("Startup request for port: " + port);
+        System.out.println("shutdown request for port: " + port);
         try {
             response.setStatus(stopServer(port));
-        }  catch (Exception e) {
-            e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         return response;
     }
@@ -165,12 +167,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("DOWN");
         System.out.println("requestHealthCheck for port: " + port);
-        try {
-            if(isServerRunning(port))
-                response.setStatus("UP");
-        }  catch (Exception e) {
-            e.printStackTrace();
-        }
+        if(isServerRunning(port))
+            response.setStatus("UP");
         return response;
     }
 

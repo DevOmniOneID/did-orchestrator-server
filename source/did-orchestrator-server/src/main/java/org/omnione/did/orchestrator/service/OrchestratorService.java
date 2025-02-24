@@ -16,30 +16,32 @@
 
 package org.omnione.did.orchestrator.service;
 
+import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.orchestrator.dto.OrchestratorResponseDto;
 
 import java.util.List;
 import java.util.Map;
 
 public interface OrchestratorService {
-    //블록체인(fabric)
+    void requestStartupAll();
+    void requestShutdownAll();
+    OrchestratorResponseDto requestHealthCheckAll();
+
+    //Hyperledger Fabric
     OrchestratorResponseDto requestStartupFabric();
     OrchestratorResponseDto requestShutdownFabric();
     OrchestratorResponseDto requestHealthCheckFabric();
 
-    // postgreSQL
+    // PostgreSQL
     OrchestratorResponseDto requestStartupPostgre();
     OrchestratorResponseDto requestShutdownPostgre();
     OrchestratorResponseDto requestHealthCheckPostgre();
 
     //서버
-    OrchestratorResponseDto requestStartup(String port);
-    OrchestratorResponseDto requestShutdown(String port);
-    OrchestratorResponseDto requestHealthCheck(String port);
+    OrchestratorResponseDto requestStartup(String port) throws OpenDidException;
+    OrchestratorResponseDto requestShutdown(String port) throws OpenDidException;
+    OrchestratorResponseDto requestHealthCheck(String port) throws OpenDidException;
     OrchestratorResponseDto requestRefresh(String port);
-    void requestStartupAll();
-    void requestShutdownAll();
-    OrchestratorResponseDto requestHealthCheckAll();
 
     OrchestratorResponseDto createWallet(String fileName, String password);
     OrchestratorResponseDto createKeys(String fileName, String password, List<String> keyIds);

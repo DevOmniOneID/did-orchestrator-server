@@ -401,7 +401,7 @@
       document.write(`
        <h3 class="server-row">
           <span id="health-icon-${port}" class="status-icon">⚪</span>
-          <span class="server-name">${serviceNames[index]} (${port}) </span>
+          <span class="server-name">${serviceNames[test]} (${port}) </span>
           <button onclick="requestServer('startup', ${port})">Start</button>
           <button class="shutdown-btn" onclick="requestServer('shutdown', ${port})">Shutdown</button>
           <button onclick="requestServer('healthcheck', ${port})">Health Check</button>
