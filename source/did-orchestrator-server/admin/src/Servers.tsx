@@ -218,7 +218,9 @@ const Servers = forwardRef((props: ServerProps, ref) => {
               <td className="p-2 pl-6 all">
                 {server.status === "PROGRESS" ? <ProgressIcon /> : server.status}
               </td>
-              <td className="p-2 font-bold">
+              <td className="p-2 font-bold"
+                onClick={() => window.location.href = `/logs/server_${server.port}.log`}
+              >
                 {server.name} ({server.port})
               </td>
               <td className="p-2">
@@ -246,10 +248,16 @@ const Servers = forwardRef((props: ServerProps, ref) => {
               </td>
               <td className="p-2">
                 <div className="flex space-x-1">
-                  <button className="bg-gray-600 text-white px-3 py-1 rounded">
+                  <button 
+                  className="bg-gray-600 text-white px-3 py-1 rounded"
+                  onClick={() => window.location.href = `http://localhost:${server.port}`}
+                  >
                     Settings
                   </button>
-                  <button className="bg-gray-600 text-white px-3 py-1 rounded">
+                  <button 
+                  className="bg-gray-600 text-white px-3 py-1 rounded"
+                  onClick={() => window.location.href = `http://localhost:${server.port}/swagger-ui/index.html`}
+                  >
                     Swagger
                   </button>
                 </div>
