@@ -56,23 +56,23 @@
 
 | API                          | Method | URL                          | 설명                          |
 |------------------------------|--------|------------------------------|-------------------------------|
-| `전체 서비스 시작`            | GET    | `/startup/all`               | 모든 서비스 시작               |
-| `전체 서비스 종료`            | GET    | `/shutdown/all`              | 모든 서비스 종료               |
-| `특정 서비스 시작`            | GET    | `/startup/{port}`            | 특정 포트의 서비스 시작        |
-| `특정 서비스 종료`            | GET    | `/shutdown/{port}`           | 특정 포트의 서비스 종료        |
-| `특정 서비스 상태 확인`       | GET    | `/healthcheck/{port}`        | 특정 포트의 서비스 상태 확인   |
-| `특정 서비스 리프레시`        | GET    | `/refresh/{port}`            | 특정 포트의 서비스 리프레시    |
-| `HyperLedger Fabric 시작`                | GET    | `/startup/fabric`            | HyperLedger Fabric 서비스 시작             |
-| `HyperLedger Fabric 종료`                | GET    | `/shutdown/fabric`           | HyperLedger Fabric 서비스 종료             |
-| `HyperLedger Fabric 상태 확인`           | GET    | `/healthcheck/fabric`        | HyperLedger Fabric 서비스 상태 확인        |
-| `PostgreSQL 시작`            | GET    | `/startup/postgre`           | PostgreSQL 서비스 시작         |
-| `PostgreSQL 종료`            | GET    | `/shutdown/postgre`          | PostgreSQL 서비스 종료         |
-| `PostgreSQL 상태 확인`       | GET    | `/healthcheck/postgre`       | PostgreSQL 서비스 상태 확인    |
+| `전체 서비스 및 엔티티 구동`            | GET    | `/startup/all`               | 모든 서비스 및 엔티티 구동               |
+| `전체 서비스 및 엔티티 종료`            | GET    | `/shutdown/all`              | 모든 서비스 및 엔티티 종료               |
+| `특정 엔티티 구동`            | GET    | `/startup/{port}`            | 특정 포트의 엔티티 시작        |
+| `특정 엔티티 종료`            | GET    | `/shutdown/{port}`           | 특정 포트의 엔티티 종료        |
+| `특정 엔티티 상태 확인`       | GET    | `/healthcheck/{port}`        | 특정 포트의 엔티티 상태 확인   |
+| `특정 엔티티 리프레시`        | GET    | `/refresh/{port}`            | 특정 포트의 엔티티 리프레시    |
+| `HyperLedger Fabric 시작`                | GET    | `/startup/fabric`            | HyperLedger Fabric 시작             |
+| `HyperLedger Fabric 종료`                | GET    | `/shutdown/fabric`           | HyperLedger Fabric 종료             |
+| `HyperLedger Fabric 상태 확인`           | GET    | `/healthcheck/fabric`        | HyperLedger Fabric 상태 확인        |
+| `PostgreSQL 시작`            | GET    | `/startup/postgre`           | PostgreSQL 시작         |
+| `PostgreSQL 종료`            | GET    | `/shutdown/postgre`          | PostgreSQL 종료         |
+| `PostgreSQL 상태 확인`       | GET    | `/healthcheck/postgre`       | PostgreSQL 상태 확인    |
 | `Wallet 생성`                | POST   | `/create/wallet`             | Wallet 생성                   |
 | `키 생성`                    | POST   | `/create/keys`               | Wallet 내 키 생성             |
 | `DID 문서 생성`              | POST   | `/create/diddoc`             | DID 문서 생성                 |
-| `설정 조회`                  | GET    | `/configs`                   | 현재 설정 조회                |
-| `설정 업데이트`              | POST   | `/configs/update`            | 설정 업데이트                 |
+| `설정 조회`                  | GET    | `/configs`                   | Orchestrator 현재 설정 조회                |
+| `설정 업데이트`              | POST   | `/configs`            | Orchestrator 설정 업데이트                 |
 
 ---
 
