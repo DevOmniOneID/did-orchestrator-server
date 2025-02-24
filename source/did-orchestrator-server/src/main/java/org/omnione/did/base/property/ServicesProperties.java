@@ -31,6 +31,7 @@ public class ServicesProperties {
     public String walletPath;
     public String didDocPath;
     public String cliToolPath;
+    public String logPath;
     public ServicesProperties(){}
 
 //    public ServiceProperty(Map<String, ServiceDetail> services) {

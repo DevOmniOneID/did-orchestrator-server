@@ -45,7 +45,7 @@ public class OrchestratorController {
     }
 
     //@GetMapping("/")
-    @GetMapping(value = {"/", "/conf"})
+    @GetMapping(value = {"/", "/conf", "/help"})
     public String index(Model model) {
 
         List<String> serviceNames = servicesProperties.getServer().values().stream()

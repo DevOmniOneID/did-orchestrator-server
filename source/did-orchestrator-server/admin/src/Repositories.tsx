@@ -202,7 +202,11 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
               <td className="p-2 pl-6">
                 {repo.status === "PROGRESS" ? <ProgressIcon /> : repo.status}
               </td>
-              <td className="p-2 font-bold">{repo.name}</td>
+              <td className="p-2 font-bold"
+                  onClick={() => window.location.href = `/logs/fabric.log`}
+              >
+                {repo.name}
+              </td>
               <td className="p-2">
                 <div className="flex space-x-1">
                   {/* onClick 핸들러에서는 단순히 함수 호출만 합니다. */}

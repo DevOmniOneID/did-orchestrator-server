@@ -58,6 +58,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     private final String DID_DOC_DIR;
     private final String CLI_TOOL_DIR;
     private final String YAML_FILE_PATH;
+    private final String LOGS_PATH;
 
     @Autowired
     public OrchestratorServiceImpl(ServicesProperties servicesProperties, BlockchainProperties blockChainProperties, DatabaseProperties databaseProperties) {
@@ -71,6 +72,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         this.WALLET_DIR = System.getProperty("user.dir") + servicesProperties.getWalletPath();
         this.DID_DOC_DIR = System.getProperty("user.dir") + servicesProperties.getDidDocPath();
         this.CLI_TOOL_DIR = System.getProperty("user.dir") + servicesProperties.getCliToolPath();
+        this.LOGS_PATH = System.getProperty("user.dir") + servicesProperties.getLogPath();
     }
 
     private Map<String, String> initializeServerJars() {
@@ -191,7 +193,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     public OrchestratorResponseDto requestStartupFabric() {
         System.out.println("requestStartupFabric");
         String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
-        String logFilePath = fabricShellPath + "/fabric.log";
+        String logFilePath = LOGS_PATH + "/fabric.log";
 
         try {
             ProcessBuilder chmodBuilder = new ProcessBuilder("chmod", "+x", fabricShellPath + "/start.sh");
@@ -226,15 +228,15 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         OrchestratorResponseDto response = requestHealthCheckFabric();
             if(response.getStatus().equals("UP")){
                 // fabric.log 파일삭제
-                File logFile = new File(logFilePath);
-                if (logFile.exists()) {
-                    boolean deleted = logFile.delete();
-                    if (deleted) {
-                        System.out.println("Fabric log file deleted: " + logFilePath);
-                    } else {
-                        System.out.println("Failed to delete fabric.log file.");
-                    }
-                }
+//                File logFile = new File(logFilePath);
+//                if (logFile.exists()) {
+//                    boolean deleted = logFile.delete();
+//                    if (deleted) {
+//                        System.out.println("Fabric log file deleted: " + logFilePath);
+//                    } else {
+//                        System.out.println("Failed to delete fabric.log file.");
+//                    }
+//                }
             }
         return response;
     }
@@ -579,7 +581,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         }
 
         ProcessBuilder builder = new ProcessBuilder(
-                "sh", "-c", "nohup java -jar " + jarFile.getAbsolutePath() + " > server_" + port + ".log 2>&1 &"
+                "sh", "-c", "nohup java -jar " + jarFile.getAbsolutePath() + " >  " + LOGS_PATH + "/server_" + port + ".log 2>&1 &"
         );
         builder.directory(new File(JARS_DIR));
         builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);

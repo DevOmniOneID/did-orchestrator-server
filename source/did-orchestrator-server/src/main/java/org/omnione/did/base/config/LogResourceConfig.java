@@ -10,7 +10,7 @@ public class LogResourceConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // server log file path
         registry.addResourceHandler("/logs/**")
-                .addResourceLocations("file:./jars/");
+                .addResourceLocations("file:./logs/");
     }
 
 }
