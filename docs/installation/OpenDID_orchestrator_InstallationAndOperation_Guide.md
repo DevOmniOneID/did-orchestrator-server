@@ -19,7 +19,7 @@ git clone https://github.com/OmniOneID/did-release.git
 ## 2. start.sh 실행
 
 프로젝트를 클론한 후, 프로젝트 루트 디렉토리로 이동하여 `start.sh` 스크립트를 실행합니다.  
-이 스크립트는 **did-release** 저장소에서 해당 버전에 맞는 서버 jar 파일을 다운로드하고, Orchestrator 서버를 구동합니다.
+이 스크립트는 **did-release** 저장소에서 해당 버전에 맞는 개별 엔티티 서버 jar 파일을 다운로드하고, Orchestrator 서버를 구동합니다.
 
 ```bash
 cd release-[버전명]/deployment
@@ -93,14 +93,7 @@ sudo systemctl enable docker
 
 ## 추가 참고 사항
 
-- Docker 컨테이너가 정상적으로 실행되었는지 확인하려면 다음 명령어를 사용하세요:  
-```bash
-docker ps
-```
-- 문제가 발생할 경우, 로그를 확인하여 원인을 파악하세요:  
-```bash
-docker logs <컨테이너_ID>
-```
+- 각 서비스 및 엔티티의 구동이 정상적으로 실행되지 않는다면 로그를 확인 할 수 있습니다.
 
 ---
 
