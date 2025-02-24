@@ -2,47 +2,35 @@
 
 ---
 
-- **일자**: 2025-02-21
+- **일자**: 2025-02-24
 - **버전**: v1.0.0
 
 ---
 
 ## 목차
 
-- [Orchestrator API 문서](#orchestrator-api-문서)
-  - [목차](#목차)
-  - [1. 개요](#1-개요)
-  - [2. API 목록](#2-api-목록)
-  - [3. API 상세 설명](#3-api-상세-설명)
-    - [3.1. 전체 서비스 시작/종료](#31-전체-서비스-시작종료)
-      - [요청 예시](#요청-예시-1)
-      - [응답 예시](#응답-예시-1)
-    - [3.2. 특정 서비스 시작/종료](#32-특정-서비스-시작종료)
-      - [요청 예시](#요청-예시-2)
-      - [응답 예시](#응답-예시-2)
-    - [3.3. 특정 서비스 상태 확인](#33-특정-서비스-상태-확인)
-      - [요청 예시](#요청-예시-3)
-      - [응답 예시](#응답-예시-3)
-    - [3.4. 특정 서비스 리프레시](#34-특정-서비스-리프레시)
-      - [요청 예시](#요청-예시-4)
-      - [응답 예시](#응답-예시-4)
-    - [3.5. HyperLedger Fabric 관련 API](#35-hyperledger-fabric-관련-api)
-      - [요청 예시](#요청-예시-5)
-      - [응답 예시](#응답-예시-5)
-    - [3.6. PostgreSQL 관련 API](#36-postgresql-관련-api)
-      - [요청 예시](#요청-예시-6)
-      - [응답 예시](#응답-예시-6)
-    - [3.7. Wallet 및 키 생성](#37-wallet-및-키-생성)
-      - [요청 예시](#요청-예시-7)
-      - [응답 예시](#응답-예시-7)
-    - [3.8. DID 문서 생성](#38-did-문서-생성)
-      - [요청 예시](#요청-예시-8)
-      - [응답 예시](#응답-예시-8)
-    - [3.9. 설정 조회 및 업데이트](#39-설정-조회-및-업데이트)
-      - [요청 예시](#요청-예시-9)
-      - [응답 예시](#응답-예시-9)
-  - [4. 에러 코드](#4-에러-코드)
-  - [5. 참고 사항](#5-참고-사항)
+1. [개요](#1-개요)
+2. [API 목록](#2-api-목록)
+3. [API 상세 설명](#3-api-상세-설명)
+   - [3.1. 전체 서비스 및 엔티티 구동](#31-전체-서비스-및-엔티티-구동)
+   - [3.2. 전체 서비스 및 엔티티 종료](#32-전체-서비스-및-엔티티-종료)
+   - [3.3. 특정 엔티티 구동](#33-특정-엔티티-구동)
+   - [3.4. 특정 엔티티 종료](#34-특정-엔티티-종료)
+   - [3.5. 특정 엔티티 상태 확인](#35-특정-엔티티-상태-확인)
+   - [3.6. 특정 엔티티 리프레시](#36-특정-엔티티-리프레시)
+   - [3.7. HyperLedger Fabric 시작](#37-hyperledger-fabric-시작)
+   - [3.8. HyperLedger Fabric 종료](#38-hyperledger-fabric-종료)
+   - [3.9. HyperLedger Fabric 상태 확인](#39-hyperledger-fabric-상태-확인)
+   - [3.10. PostgreSQL 시작](#310-postgresql-시작)
+   - [3.11. PostgreSQL 종료](#311-postgresql-종료)
+   - [3.12. PostgreSQL 상태 확인](#312-postgresql-상태-확인)
+   - [3.13. Wallet 생성](#313-wallet-생성)
+   - [3.14. Wallet 키쌍 생성](#314-wallet-키쌍-생성)
+   - [3.15. DID 문서 생성](#315-did-문서-생성)
+   - [3.16. 설정 조회](#316-설정-조회)
+   - [3.17. 설정 업데이트](#317-설정-업데이트)
+4. [에러 코드](#4-에러-코드)
+5. [참고 사항](#5-참고-사항)
 
 ---
 
@@ -69,7 +57,7 @@
 | `PostgreSQL 종료`            | GET    | `/shutdown/postgre`          | PostgreSQL 종료         |
 | `PostgreSQL 상태 확인`       | GET    | `/healthcheck/postgre`       | PostgreSQL 상태 확인    |
 | `Wallet 생성`                | POST   | `/create/wallet`             | Wallet 생성                   |
-| `키 생성`                    | POST   | `/create/keys`               | Wallet 내 키 생성             |
+| `Wallet 키쌍 생성`                    | POST   | `/create/keys`               | Wallet 내 키 생성             |
 | `DID 문서 생성`              | POST   | `/create/diddoc`             | DID 문서 생성                 |
 | `설정 조회`                  | GET    | `/configs`                   | Orchestrator 현재 설정 조회                |
 | `설정 업데이트`              | POST   | `/configs`            | Orchestrator 설정 업데이트                 |
@@ -78,16 +66,16 @@
 
 ## 3. API 상세 설명
 
-### 3.1. 전체 서비스 시작/종료
+### 3.1. 전체 서비스 및 엔티티 구동
 
-- **URL**: `/startup/all`, `/shutdown/all`
+- **URL**: `/startup/all`
 - **Method**: `GET`
-- **설명**: Orchestrator가 관리하는 모든 서비스를 시작하거나 종료합니다.
+- **설명**: Orchestrator가 관리하는 모든 서비스 및 엔티티를 시작합니다.
 
 #### 요청 예시
 
 ```shell
-curl -X GET "http://${Host}:${Port}/startup/all"
+curl -X GET "http://${Host}:9001/startup/all"
 ```
 
 #### 응답 예시
@@ -100,16 +88,16 @@ curl -X GET "http://${Host}:${Port}/startup/all"
 
 ---
 
-### 3.2. 특정 서비스 시작/종료
+### 3.2. 전체 서비스 및 엔티티 종료
 
-- **URL**: `/startup/{port}`, `/shutdown/{port}`
+- **URL**: `/shutdown/all`
 - **Method**: `GET`
-- **설명**: 특정 포트의 서비스를 시작하거나 종료합니다.
+- **설명**: Orchestrator가 관리하는 모든 서비스 및 엔티티를 종료합니다.
 
 #### 요청 예시
 
 ```shell
-curl -X GET "http://${Host}:${Port}/startup/8080"
+curl -X GET "http://${Host}:9001/startup/all"
 ```
 
 #### 응답 예시
@@ -122,16 +110,60 @@ curl -X GET "http://${Host}:${Port}/startup/8080"
 
 ---
 
-### 3.3. 특정 서비스 상태 확인
+### 3.3. 특정 엔티티 구동
+
+- **URL**: `/startup/{port}`
+- **Method**: `GET`
+- **설명**: 특정 포트의 엔티티를 시작합니다.
+
+#### 요청 예시
+
+```shell
+curl -X GET "http://${Host}:9001/startup/8090"
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
+### 3.4. 특정 엔티티 종료
+
+- **URL**: `/shutdown/{port}`
+- **Method**: `GET`
+- **설명**: 특정 포트의 엔티티를 종료합니다.
+
+#### 요청 예시
+
+```shell
+curl -X GET "http://${Host}:9001/shutdown/8090"
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
+### 3.5. 특정 엔티티 상태 확인
 
 - **URL**: `/healthcheck/{port}`
 - **Method**: `GET`
-- **설명**: 특정 포트의 서비스 상태를 확인합니다.
+- **설명**: 특정 포트의 엔티티 상태를 확인합니다.
 
 #### 요청 예시
 
 ```shell
-curl -X GET "http://${Host}:${Port}/healthcheck/8080"
+curl -X GET "http://${Host}:9001/healthcheck/8090"
 ```
 
 #### 응답 예시
@@ -144,16 +176,16 @@ curl -X GET "http://${Host}:${Port}/healthcheck/8080"
 
 ---
 
-### 3.4. 특정 서비스 리프레시
+### 3.6. 특정 엔티티 리프레시
 
 - **URL**: `/refresh/{port}`
 - **Method**: `GET`
-- **설명**: 특정 포트의 서비스를 리프레시합니다.
+- **설명**: 특정 포트의 엔티티를 리프레시합니다.
 
 #### 요청 예시
 
 ```shell
-curl -X GET "http://${Host}:${Port}/refresh/8080"
+curl -X GET "http://${Host}:9001/refresh/9001"
 ```
 
 #### 응답 예시
@@ -166,16 +198,16 @@ curl -X GET "http://${Host}:${Port}/refresh/8080"
 
 ---
 
-### 3.5. HyperLedger Fabric 관련 API
+### 3.7. HyperLedger Fabric 시작
 
-- **URL**: `/startup/fabric`, `/shutdown/fabric`, `/healthcheck/fabric`
+- **URL**: `/startup/fabric`
 - **Method**: `GET`
-- **설명**: HyperLedger Fabric 서비스의 시작, 종료, 상태 확인을 수행합니다.
+- **설명**: HyperLedger Fabric 서비스의 시작을 수행합니다.
 
 #### 요청 예시
 
 ```shell
-curl -X GET "http://${Host}:${Port}/startup/fabric"
+curl -X GET "http://${Host}:9001/startup/fabric"
 ```
 
 #### 응답 예시
@@ -188,16 +220,16 @@ curl -X GET "http://${Host}:${Port}/startup/fabric"
 
 ---
 
-### 3.6. PostgreSQL 관련 API
+### 3.8. HyperLedger Fabric 종료
 
-- **URL**: `/startup/postgre`, `/shutdown/postgre`, `/healthcheck/postgre`
+- **URL**: `/shutdown/fabric`
 - **Method**: `GET`
-- **설명**: PostgreSQL 서비스의 시작, 종료, 상태 확인을 수행합니다.
+- **설명**: HyperLedger Fabric 서비스의 종료를 수행합니다.
 
 #### 요청 예시
 
 ```shell
-curl -X GET "http://${Host}:${Port}/startup/postgre"
+curl -X GET "http://${Host}:9001/shutdown/fabric"
 ```
 
 #### 응답 예시
@@ -210,18 +242,106 @@ curl -X GET "http://${Host}:${Port}/startup/postgre"
 
 ---
 
-### 3.7. Wallet 및 키 생성
+### 3.9. HyperLedger Fabric 상태 확인
 
-- **URL**: `/create/wallet`, `/create/keys`
+- **URL**: `/healthcheck/fabric`
+- **Method**: `GET`
+- **설명**: HyperLedger Fabric 서비스의 상태 확인을 수행합니다.
+
+#### 요청 예시
+
+```shell
+curl -X GET "http://${Host}:9001/healthcheck/fabric"
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
+### 3.10. PostgreSQL 시작
+
+- **URL**: `/startup/postgre`
+- **Method**: `GET`
+- **설명**: PostgreSQL 서비스의 시작을 수행합니다.
+
+#### 요청 예시
+
+```shell
+curl -X GET "http://${Host}:9001/startup/postgre"
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
+### 3.11. PostgreSQL 종료
+
+- **URL**: `/shutdown/postgre`
+- **Method**: `GET`
+- **설명**: PostgreSQL 서비스의 종료를 수행합니다.
+
+#### 요청 예시
+
+```shell
+curl -X GET "http://${Host}:9001/shutdown/postgre"
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
+### 3.12. PostgreSQL 상태 확인
+
+- **URL**: `/healthcheck/postgre`
+- **Method**: `GET`
+- **설명**: PostgreSQL 서비스의 상태 확인을 수행합니다.
+
+#### 요청 예시
+
+```shell
+curl -X GET "http://${Host}:9001/healthcheck/postgre"
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
+### 3.13. Wallet 생성
+
+- **URL**: `/create/wallet`
 - **Method**: `POST`
-- **설명**: Wallet을 생성하거나 Wallet 내에 키를 생성합니다.
+- **설명**: Wallet을 생성합니다.
 
 #### 요청 예시
 
 ```shell
-curl -X POST "http://${Host}:${Port}/create/wallet" \
+curl -X POST "http://${Host}:9001/create/wallet" \
 -H "Content-Type: application/json" \
--d '{"filename": "wallet1", "password": "password123"}'
+-d '{"filename": "tas", "password": "123456"}'
 ```
 
 #### 응답 예시
@@ -234,7 +354,45 @@ curl -X POST "http://${Host}:${Port}/create/wallet" \
 
 ---
 
-### 3.8. DID 문서 생성
+### 3.14. Wallet 키쌍 생성
+
+- **URL**: `/create/keys`
+- **Method**: `POST`
+- **설명**: Wallet 내에 키쌍을 생성합니다.
+
+#### 요청 예시
+
+```shell
+1. TAS
+curl -X POST "http://${Host}:9001/create/keys" \
+-H "Content-Type: application/json" \
+-d '{
+  "filename": "tas",
+  "password": "123456",
+  "keyIds": ["assert", "auth", "keyagree", "invoke"]
+}'
+
+2. Entities
+curl -X POST "http://${Host}:9001/create/keys" \
+-H "Content-Type: application/json" \
+-d '{
+  "filename": "issuer",
+  "password": "123456",
+  "keyIds": ["assert", "auth", "keyagree"]
+}'
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
+### 3.15. DID 문서 생성
 
 - **URL**: `/create/diddoc`
 - **Method**: `POST`
@@ -243,9 +401,27 @@ curl -X POST "http://${Host}:${Port}/create/wallet" \
 #### 요청 예시
 
 ```shell
-curl -X POST "http://${Host}:${Port}/create/diddoc" \
+1. TAS
+curl -X POST "http://${Host}:9001/create/diddoc" \
 -H "Content-Type: application/json" \
--d '{"filename": "wallet1", "password": "password123", "did": "did:example:123", "controller": "did:example:456", "type": "Ed25519"}'
+-d '{
+  "filename": "tas",
+  "password": "123456",
+  "did": "did:omn:tas",
+  "controller": "did:omn:tas",
+  "type": "TAS"
+}'
+
+2. Entities
+curl -X POST "http://${Host}:9001/create/diddoc" \
+-H "Content-Type: application/json" \
+-d '{
+  "filename": "issuer",
+  "password": "123456",
+  "did": "did:omn:issuer",
+  "controller": "did:omn:tas",
+  "type": "ENTITY"
+}'
 ```
 
 #### 응답 예시
@@ -258,34 +434,158 @@ curl -X POST "http://${Host}:${Port}/create/diddoc" \
 
 ---
 
-### 3.9. 설정 조회 및 업데이트
+### 3.16. 설정 조회
 
-- **URL**: `/configs`, `/configs/update`
-- **Method**: `GET`, `POST`
-- **설명**: 현재 설정을 조회하거나 업데이트합니다.
+- **URL**: `/configs`
+- **Method**: `GET`
+- **설명**: `/configs의 application.yml`의 현재설정을 조회합니다.
 
 #### 요청 예시
 
 ```shell
-curl -X GET "http://${Host}:${Port}/configs"
+curl -X GET "http://${Host}:9001/configs"
 ```
 
 #### 응답 예시
 
 ```json
 {
-  "blockchain": "fabric",
-  "database": "postgresql",
+  "blockchain": {
+    "channel": "mychannel",
+    "chaincodeName": "opendid"
+  },
+  "database": {
+    "port": "5430",
+    "user": "omn",
+    "password": "omn",
+    "db": "omn"
+  },
   "services": {
-    "service1": {
-      "port": 8080,
-      "status": "RUNNING"
-    }
+    "server": {
+      "tas": {
+        "name": "TAS",
+        "port": 8090,
+        "file": "did-ta-server-1.0.0.jar"
+      },
+      "issuer": {
+        "name": "Issuer",
+        "port": 8091,
+        "file": "did-issuer-server-1.0.0.jar"
+      },
+      "verifier": {
+        "name": "Verifier",
+        "port": 8092,
+        "file": "did-verifier-server-1.0.0.jar"
+      },
+      "api": {
+        "name": "API",
+        "port": 8093,
+        "file": "did-api-server-1.0.0.jar"
+      },
+      "cas": {
+        "name": "CAS",
+        "port": 8094,
+        "file": "did-cas-server-1.0.0.jar"
+      },
+      "wallet": {
+        "name": "WalletService",
+        "port": 8095,
+        "file": "did-wallet-server-1.0.0.jar"
+      },
+      "demo": {
+        "name": "Demo",
+        "port": 8099,
+        "file": "did-demo-server-1.0.0.jar"
+      }
+    },
+    "jarPath": "/jars",
+    "walletPath": "/wallet",
+    "didDocPath": "/DIDDoc",
+    "cliToolPath": "/tool"
   }
 }
 ```
 
 ---
+
+### 3.17. 설정 업데이트
+
+- **URL**: `/configs`
+- **Method**: `POST`
+- **설명**: `/configs의 application.yml`을 업데이트합니다.
+
+#### 요청 예시
+
+```shell
+curl -X POST "http://${Host}:9001/configs" \
+-H "Content-Type: application/json" \
+-d '{
+  "blockchain": {
+    "channel": "mychannel2",
+    "chaincodeName": "opendid"
+  },
+  "database": {
+    "port": "5430",
+    "user": "omn",
+    "password": "omn",
+    "db": "omn"
+  },
+  "services": {
+    "server": {
+      "tas": {
+        "name": "TAS",
+        "port": 8090,
+        "file": "did-ta-server-1.0.0.jar"
+      },
+      "issuer": {
+        "name": "Issuer",
+        "port": 8091,
+        "file": "did-issuer-server-1.0.0.jar"
+      },
+      "verifier": {
+        "name": "Verifier",
+        "port": 8092,
+        "file": "did-verifier-server-1.0.0.jar"
+      },
+      "api": {
+        "name": "API",
+        "port": 8093,
+        "file": "did-api-server-1.0.0.jar"
+      },
+      "cas": {
+        "name": "CAS",
+        "port": 8094,
+        "file": "did-cas-server-1.0.0.jar"
+      },
+      "wallet": {
+        "name": "WalletService",
+        "port": 8095,
+        "file": "did-wallet-server-1.0.0.jar"
+      },
+      "demo": {
+        "name": "Demo",
+        "port": 8099,
+        "file": "did-demo-server-1.0.0.jar"
+      }
+    },
+    "jarPath": "/jars",
+    "walletPath": "/wallet",
+    "didDocPath": "/DIDDoc",
+    "cliToolPath": "/tool"
+  }
+}'
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
 
 ## 4. 에러 코드
 
