@@ -22,7 +22,7 @@ git clone https://github.com/OmniOneID/did-release.git
 이 스크립트는 **did-release** 저장소에서 해당 버전에 맞는 개별 엔티티 서버 jar 파일을 다운로드하고, Orchestrator 서버를 구동합니다.
 
 ```bash
-cd release-[버전명]/deployment
+cd did-release/release-[버전명]/deployment
 sh start.sh
 ```
 
