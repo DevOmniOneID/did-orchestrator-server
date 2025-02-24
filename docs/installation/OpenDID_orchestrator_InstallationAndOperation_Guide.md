@@ -11,7 +11,7 @@
 아래 명령어를 터미널에 입력하여 프로젝트를 다운로드하세요.
 
 ```bash
-git clone https://github.com/your-repository/did-orchestrator.git
+git clone https://github.com/OmniOneID/did-release.git
 ```
 
 ---
@@ -22,7 +22,7 @@ git clone https://github.com/your-repository/did-orchestrator.git
 이 스크립트는 **did-release** 저장소에서 해당 버전에 맞는 서버 jar 파일을 다운로드하고, Orchestrator 서버를 구동합니다.
 
 ```bash
-cd did-orchestrator
+cd release-[버전명]/deployment
 sh start.sh
 ```
 
