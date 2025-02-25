@@ -22,8 +22,12 @@ did-orchestrator-server
 ├── RELEASE-PROCESS.md
 ├── SECURITY.md
 ├── docs
-│   └── api
-│       └── Orchestrator_API_ko.md
+│    ├── api
+│    │    └── Orchestrator_API_ko.md
+│    ├── installation
+│    │    └── Orchestrator_installation_Guide.md
+│    └── manual
+│         └── Orchestrator_manual.md
 └── source
     └── did-orchestrator-server
         ├── gradle
@@ -49,6 +53,8 @@ did-orchestrator-server
 | SECURITY.md                      | 보안 정책 및 취약성 보고 방법            |
 | docs                             | 문서화                                   |
 | ┖ api                            | API 가이드 문서                          |
+| ┖ installation                   | 설치 및 구동 가이드 문서                          |
+| ┖ manual                         | 메뉴얼                          |
 | source                           | 서버 소스 코드 프로젝트                  |
 | ┖ did-orchestrator-server        | Orchestrator 서버 소스 코드 및 빌드 파일 |
 | &nbsp;&nbsp;&nbsp;┖ gradle       | Gradle 빌드 설정 및 스크립트             |
