@@ -21,14 +21,15 @@
    - [3.7. HyperLedger Fabric 시작](#37-hyperledger-fabric-시작)
    - [3.8. HyperLedger Fabric 종료](#38-hyperledger-fabric-종료)
    - [3.9. HyperLedger Fabric 상태 확인](#39-hyperledger-fabric-상태-확인)
-   - [3.10. PostgreSQL 시작](#310-postgresql-시작)
-   - [3.11. PostgreSQL 종료](#311-postgresql-종료)
-   - [3.12. PostgreSQL 상태 확인](#312-postgresql-상태-확인)
-   - [3.13. Wallet 생성](#313-wallet-생성)
-   - [3.14. Wallet 키쌍 생성](#314-wallet-키쌍-생성)
-   - [3.15. DID 문서 생성](#315-did-문서-생성)
-   - [3.16. 설정 조회](#316-설정-조회)
-   - [3.17. 설정 업데이트](#317-설정-업데이트)
+   - [3.10. HyperLedger Fabric 초기화](#310-hyperledger-fabric-초기화)
+   - [3.11. PostgreSQL 시작](#311-postgresql-시작)
+   - [3.12. PostgreSQL 종료](#312-postgresql-종료)
+   - [3.13. PostgreSQL 상태 확인](#313-postgresql-상태-확인)
+   - [3.14. Wallet 생성](#314-wallet-생성)
+   - [3.15. Wallet 키쌍 생성](#315-wallet-키쌍-생성)
+   - [3.16. DID 문서 생성](#316-did-문서-생성)
+   - [3.17. 설정 조회](#317-설정-조회)
+   - [3.18. 설정 업데이트](#318-설정-업데이트)
 4. [에러 코드](#4-에러-코드)
 5. [참고 사항](#5-참고-사항)
 
@@ -53,6 +54,7 @@
 | `HyperLedger Fabric 시작`                | GET    | `/startup/fabric`            | HyperLedger Fabric 시작             |
 | `HyperLedger Fabric 종료`                | GET    | `/shutdown/fabric`           | HyperLedger Fabric 종료             |
 | `HyperLedger Fabric 상태 확인`           | GET    | `/healthcheck/fabric`        | HyperLedger Fabric 상태 확인        |
+| `HyperLedger Fabric 초기화`           | GET    | `/reset/fabric`        | HyperLedger Fabric 초기화        |
 | `PostgreSQL 시작`            | GET    | `/startup/postgre`           | PostgreSQL 시작         |
 | `PostgreSQL 종료`            | GET    | `/shutdown/postgre`          | PostgreSQL 종료         |
 | `PostgreSQL 상태 확인`       | GET    | `/healthcheck/postgre`       | PostgreSQL 상태 확인    |
@@ -264,7 +266,29 @@ curl -X GET "http://${Host}:9001/healthcheck/fabric"
 
 ---
 
-### 3.10. PostgreSQL 시작
+### 3.10. HyperLedger Fabric 초기화
+
+- **URL**: `/reset/fabric`
+- **Method**: `GET`
+- **설명**: HyperLedger Fabric 초기화를 수행합니다.
+
+#### 요청 예시
+
+```shell
+curl -X GET "http://${Host}:9001/reset/fabric"
+```
+
+#### 응답 예시
+
+```json
+{
+  "status": "SUCCESS"
+}
+```
+
+---
+
+### 3.11. PostgreSQL 시작
 
 - **URL**: `/startup/postgre`
 - **Method**: `GET`
@@ -286,7 +310,7 @@ curl -X GET "http://${Host}:9001/startup/postgre"
 
 ---
 
-### 3.11. PostgreSQL 종료
+### 3.12. PostgreSQL 종료
 
 - **URL**: `/shutdown/postgre`
 - **Method**: `GET`
@@ -308,7 +332,7 @@ curl -X GET "http://${Host}:9001/shutdown/postgre"
 
 ---
 
-### 3.12. PostgreSQL 상태 확인
+### 3.13. PostgreSQL 상태 확인
 
 - **URL**: `/healthcheck/postgre`
 - **Method**: `GET`
@@ -330,7 +354,8 @@ curl -X GET "http://${Host}:9001/healthcheck/postgre"
 
 ---
 
-### 3.13. Wallet 생성
+
+### 3.14. Wallet 생성
 
 - **URL**: `/create/wallet`
 - **Method**: `POST`
@@ -354,7 +379,7 @@ curl -X POST "http://${Host}:9001/create/wallet" \
 
 ---
 
-### 3.14. Wallet 키쌍 생성
+### 3.15. Wallet 키쌍 생성
 
 - **URL**: `/create/keys`
 - **Method**: `POST`
@@ -392,7 +417,7 @@ curl -X POST "http://${Host}:9001/create/keys" \
 
 ---
 
-### 3.15. DID 문서 생성
+### 3.16. DID 문서 생성
 
 - **URL**: `/create/diddoc`
 - **Method**: `POST`
@@ -434,7 +459,7 @@ curl -X POST "http://${Host}:9001/create/diddoc" \
 
 ---
 
-### 3.16. 설정 조회
+### 3.17. 설정 조회
 
 - **URL**: `/configs`
 - **Method**: `GET`
@@ -508,7 +533,7 @@ curl -X GET "http://${Host}:9001/configs"
 
 ---
 
-### 3.17. 설정 업데이트
+### 3.18. 설정 업데이트
 
 - **URL**: `/configs`
 - **Method**: `POST`
