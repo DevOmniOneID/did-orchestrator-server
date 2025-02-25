@@ -43,7 +43,7 @@ const Demo = forwardRef((props, ref) => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     var allStatus = localStorage.getItem("allStatus")
-    setShowDemoActionsAndInfo(allStatus === "🔴");
+    setShowDemoActionsAndInfo(allStatus === "🟢");
   };
 
   useImperativeHandle(ref, () => ({
