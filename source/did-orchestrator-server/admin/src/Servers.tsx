@@ -55,11 +55,13 @@ const Servers = forwardRef((props: ServerProps, ref) => {
       return;
     }
 
+    /*
     setServers((prevServers) =>
       prevServers.map((server) =>
         server.id === serverId ? { ...server, status: "PROGRESS" } : server
       )
     );
+    */
 
     try {
       const response = await fetch(`/healthcheck/${serverPort}`, { method: "GET" });
@@ -219,7 +221,7 @@ const Servers = forwardRef((props: ServerProps, ref) => {
                 {server.status === "PROGRESS" ? <ProgressIcon /> : server.status}
               </td>
               <td className="p-2 font-bold"
-                onClick={() => window.location.href = `/logs/server_${server.port}.log`}
+                onClick={()  => window.open(`/logs/server_${server.port}.log`)}
               >
                 {server.name} ({server.port})
               </td>
@@ -250,13 +252,13 @@ const Servers = forwardRef((props: ServerProps, ref) => {
                 <div className="flex space-x-1">
                   <button 
                   className="bg-gray-600 text-white px-3 py-1 rounded"
-                  onClick={() => window.location.href = `http://localhost:${server.port}`}
+                  onClick={() => window.open(`http://localhost:${server.port}`)}
                   >
                     Settings
                   </button>
                   <button 
                   className="bg-gray-600 text-white px-3 py-1 rounded"
-                  onClick={() => window.location.href = `http://localhost:${server.port}/swagger-ui/index.html`}
+                  onClick={() => window.open(`http://localhost:${server.port}/swagger-ui/index.html`)}
                   >
                     Swagger
                   </button>

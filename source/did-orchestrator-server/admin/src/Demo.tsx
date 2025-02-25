@@ -56,7 +56,9 @@ const Demo = forwardRef((props, ref) => {
       alert("The operation is currently in progress. Please try again later.");
       return;
     }
+    /*
     setDemo((prev) => ({ ...prev, status: "PROGRESS" }));
+    */
     try {
       const response = await fetch(`/healthcheck/${demo.port}`, { method: "GET" });
       if (!response.ok) {
@@ -142,54 +144,56 @@ const Demo = forwardRef((props, ref) => {
           </tr>
         </thead>
         <tbody className="server-table">
-          <tr className="border-b">
-            <td className="p-2 pl-6 demo">
-              {demo.status === "PROGRESS" ? <ProgressIcon /> : demo.status}
-            </td>
-            <td className="p-2 font-bold">
-              {demo.name} ({demo.port})
-            </td>
-            <td className="p-2">
-              {showDemoActionsAndInfo ? (
+        <tr className="border-b">
+          <td className="p-2 pl-6 demo">
+            {demo.status === "PROGRESS" ? <ProgressIcon/> : demo.status}
+          </td>
+          <td className="p-2 font-bold"
+              onClick={() => window.open(`/logs/server_${demo.port}.log`)}
+          >
+            {demo.name} ({demo.port})
+          </td>
+          <td className="p-2">
+            {showDemoActionsAndInfo ? (
                 <div className="flex space-x-1">
                   <button
-                    className="bg-green-600 text-white px-3 py-1 rounded"
-                    onClick={() => startDemo(true)}
+                      className="bg-green-600 text-white px-3 py-1 rounded"
+                      onClick={() => startDemo(true)}
                   >
                     Start
                   </button>
                   <button
-                    className="bg-red-600 text-white px-3 py-1 rounded"
-                    onClick={() => stopDemo(true)}
+                      className="bg-red-600 text-white px-3 py-1 rounded"
+                      onClick={() => stopDemo(true)}
                   >
                     Stop
                   </button>
                   <button
-                    className="bg-gray-600 text-white px-3 py-1 rounded"
-                    onClick={() => healthCheckDemo(true)}
+                      className="bg-gray-600 text-white px-3 py-1 rounded"
+                      onClick={() => healthCheckDemo(true)}
                   >
                     Status
                   </button>
                 </div>
-              ) : (
+            ) : (
                 <>-</>
-              )}
-            </td>
-            <td className="p-2">
+            )}
+          </td>
+          <td className="p-2">
             {showDemoActionsAndInfo ? (
                 <div className="flex space-x-1">
                   <button className="bg-gray-600 text-white px-3 py-1 rounded"
-                    onClick={() => window.location.href = `http://localhost:${demo.port}`}
-                    >
+                          onClick={() => window.open(`http://localhost:${demo.port}`)}
+                  >
                     Demo Site
                   </button>
-              </div>
-              ) : (
+                </div>
+            ) : (
                 <>-</>
-              )}
-            </td>
-            <td className="p-2"></td>
-          </tr>
+            )}
+          </td>
+          <td className="p-2"></td>
+        </tr>
         </tbody>
       </table>
     </section>

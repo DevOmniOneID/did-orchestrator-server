@@ -290,7 +290,9 @@ const App: React.FC = () => {
     if (repositoriesRef.current) {
       await repositoriesRef.current.startAll();
     }
+    alert('aaa')
     if (serversRef.current) {
+      alert('bbb')
       await serversRef.current.startAll();
     }
 

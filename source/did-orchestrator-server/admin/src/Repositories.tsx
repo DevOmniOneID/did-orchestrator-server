@@ -43,11 +43,13 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
       return;
     }
 
+    /*
     setRepositories((prevRepos) =>
       prevRepos.map((repo) =>
         repo.id === repoId ? { ...repo, status: "PROGRESS" } : repo
       )
     );
+    */
 
     try {
       const response = await fetch(`/healthcheck/${repoId}`, {
@@ -203,7 +205,7 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
                 {repo.status === "PROGRESS" ? <ProgressIcon /> : repo.status}
               </td>
               <td className="p-2 font-bold"
-                  onClick={() => window.location.href = `/logs/fabric.log`}
+                  onClick={() => window.open(`/logs/${repo.id}.log`)}
               >
                 {repo.name}
               </td>
