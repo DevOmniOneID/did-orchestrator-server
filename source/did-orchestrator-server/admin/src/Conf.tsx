@@ -213,7 +213,14 @@ const Conf: React.FC = () => {
               <div className="mb-6">
                 <h3 className="text-lg font-bold mb-4">
                   Database
-                  <button className="text-gray-500 hover:text-gray-700 ml-1">
+                  <button
+                      onClick={(e) =>
+                          showToolTip(
+                              "The following settings are parameters applied when running PostresSQL. <br>Their meanings are as follows: <br>- Port: The port on which the database will run.<br>- User: The master user ID for the database.<br>- Password: The master user password for the database.<br>- Db: The name of the default database.",
+                              e
+                          )
+                      }
+                      className="text-gray-500 hover:text-gray-700 ml-1">
                     <HelpIcon width="0.9em" height="0.9em" />
                   </button>
                 </h3>
@@ -250,7 +257,14 @@ const Conf: React.FC = () => {
               <div className="mb-6">
                 <h3 className="text-lg font-bold mb-2">
                   Server
-                  <button className="text-gray-500 hover:text-gray-700 ml-1">
+                  <button
+                      onClick={(e) =>
+                          showToolTip(
+                              "The following settings are parameters applied when finding Servers. <br>Their meanings are as follows: <br>- Service: Unique ID of the service.<br>- Name: Name of the service.<br>- Port: Port used by the service.<br>- File: Name of the JAR file.",
+                              e
+                          )
+                      }
+                      className="text-gray-500 hover:text-gray-700 ml-1">
                     <HelpIcon width="0.9em" height="0.9em" />
                   </button>
                 </h3>
@@ -301,7 +315,14 @@ const Conf: React.FC = () => {
               <div>
                 <h3 className="text-lg font-bold mb-2">
                   Service Paths
-                  <button className="text-gray-500 hover:text-gray-700 ml-1">
+                  <button
+                      className="text-gray-500 hover:text-gray-700 ml-1"
+                      onClick={(e) =>
+                          showToolTip(
+                              "The following settings are parameters of service paths. <br>Their meanings are as follows: <br>- jarPath: JAR file path<br>- walletPath: Wallet file path<br>- didDocPath: DID Document file path<br>- cliToolPath: CLI Tool path<br>- logPath: Log file path<br>",
+                              e
+                          )
+                      }>
                     <HelpIcon width="0.9em" height="0.9em" />
                   </button>
                 </h3>
