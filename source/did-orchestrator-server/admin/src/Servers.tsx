@@ -1,5 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import HelpIcon from './icons/HelpIcon';
+import LogIcon from './icons/LogIcon';
 import showToolTip from "./Tooltip";
 import ProgressIcon from "./icons/ProgressIcon";
 
@@ -220,10 +221,8 @@ const Servers = forwardRef((props: ServerProps, ref) => {
               <td className="p-2 pl-6 all">
                 {server.status === "PROGRESS" ? <ProgressIcon /> : server.status}
               </td>
-              <td className="p-2 font-bold"
-                onClick={()  => window.open(`/logs/server_${server.port}.log`)}
-              >
-                {server.name} ({server.port})
+              <td className="p-2 font-bold">
+                {server.name} ({server.port}) <button onClick={()  => window.open(`/logs/server_${server.port}.log`)}><LogIcon width="0.8em" height="0.8em" /></button>
               </td>
               <td className="p-2">
                 <div className="flex space-x-1">

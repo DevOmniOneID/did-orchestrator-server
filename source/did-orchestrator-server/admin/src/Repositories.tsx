@@ -1,5 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import ProgressIcon from "./icons/ProgressIcon";
+import LogIcon from "./icons/LogIcon";
 
 interface Repository {
   id: string;
@@ -232,10 +233,8 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
               <td className="p-2 pl-6">
                 {repo.status === "PROGRESS" ? <ProgressIcon /> : repo.status}
               </td>
-              <td className="p-2 font-bold"
-                  onClick={() => window.open(`/logs/${repo.id}.log`)}
-              >
-                {repo.name}
+              <td className="p-2 font-bold">
+                {repo.name} <button onClick={() => window.open(`/logs/${repo.id}.log`)}><LogIcon width="0.8em" height="0.8em"/></button>
               </td>
               <td className="p-2">
                 <div className="flex space-x-1">

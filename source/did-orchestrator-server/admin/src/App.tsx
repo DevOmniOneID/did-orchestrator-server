@@ -32,6 +32,17 @@ const App: React.FC = () => {
     localStorage.setItem("allStatus", status);
   }, [status]);
 
+  // 최초 구동 여부를 체크하기 위한 ref
+  const hasMountedRef = useRef(false);
+
+  // ref 콜백을 통해 최초 한 번만 statusAll() 호출
+  const sectionRef = (node: HTMLElement | null) => {
+    if (node && !hasMountedRef.current) {
+      hasMountedRef.current = true;
+      if(status != "⚪") statusAll();
+    }
+  };
+
   const openPopupDid = (id: string) => setPopupDid(id);
   const closePopupDid = () => setPopupDid(null);
   const openPopupWallet = (id: string) => setPopupWallet(id);
@@ -64,6 +75,10 @@ const App: React.FC = () => {
           const servers = JSON.parse(serversData);
           if (Array.isArray(servers)) {
             for (let i = 0; i < servers.length; i++) {
+              if (servers[i].id === "api") {
+                continue; // id가 "api"인 경우 제외
+              }
+
               var serverId = servers[i].id;
 
               var filename = serverId;
@@ -119,6 +134,7 @@ const App: React.FC = () => {
               }
             }
             alert(`Generation All created successfully!`);
+            closeGenerateAll();
           } else {
             alert(`Generation All creation failed`);
           }
@@ -190,6 +206,7 @@ const App: React.FC = () => {
       }
   
       alert("Wallet created successfully!");
+      closePopupWallet();
     } catch (error) {
       console.error("Error creating wallet:", error);
       alert("An error occurred while creating the wallet.");
@@ -221,7 +238,7 @@ const App: React.FC = () => {
       return;
     }
 
-    var controller = localStorage.getItem("didController");
+    var controller = localStorage.getItem("didController") || "did:omn:tas";
     const type = localStorage.getItem("didType");
     if (type == "TAS") {
       controller = did;
@@ -252,6 +269,7 @@ const App: React.FC = () => {
       }
 
       alert("DID Document created successfully!");
+      closePopupDid();
     } catch (error) {
       console.error("Error creating wallet:", error);
       alert("An error occurred while creating the DID Document.");
@@ -363,7 +381,7 @@ const App: React.FC = () => {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main ref={sectionRef} className="flex-1 p-6 bg-gray-100 h-[1250px]">
           {/* Top Header */}
           <header className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -478,7 +496,7 @@ const App: React.FC = () => {
             <form onSubmit={handleGenAllSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Password</label>
-                <input type="password" name="genAllPassword" className="w-full border p-2 rounded" />
+                <input type="password" name="genAllPassword" className="w-full border p-2 rounded" autoFocus />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Confirm Password</label>
@@ -513,7 +531,7 @@ const App: React.FC = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Password</label>
-                <input type="password" name="didPassword" className="w-full border p-2 rounded" />
+                <input type="password" name="didPassword" className="w-full border p-2 rounded" autoFocus />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Confirm Password</label>
@@ -544,7 +562,7 @@ const App: React.FC = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Password</label>
-                <input type="password" name="walletPassword" className="w-full border p-2 rounded" />
+                <input type="password" name="walletPassword" className="w-full border p-2 rounded" autoFocus />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Confirm Password</label>

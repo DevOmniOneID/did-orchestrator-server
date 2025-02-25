@@ -2,6 +2,7 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from "rea
 import HelpIcon from "./icons/HelpIcon";
 import showToolTip from "./Tooltip";
 import ProgressIcon from "./icons/ProgressIcon";
+import LogIcon from './icons/LogIcon';
 
 interface Demo {
   id: string;
@@ -151,12 +152,12 @@ const Demo = forwardRef((props, ref) => {
           <td className="p-2 font-bold"
               onClick={() => window.open(`/logs/server_${demo.port}.log`)}
           >
-            {demo.name} ({demo.port})
+            {demo.name} ({demo.port}) <button onClick={() => window.open(`/logs/server_${demo.port}.log`)}><LogIcon width="0.8em" height="0.8em"/></button>
           </td>
           <td className="p-2">
             {showDemoActionsAndInfo ? (
                 <div className="flex space-x-1">
-                  <button
+                <button
                       className="bg-green-600 text-white px-3 py-1 rounded"
                       onClick={() => startDemo(true)}
                   >
