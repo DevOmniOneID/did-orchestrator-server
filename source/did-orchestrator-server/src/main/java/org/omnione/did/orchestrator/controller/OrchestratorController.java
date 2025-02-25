@@ -183,6 +183,19 @@ public class OrchestratorController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/reset/fabric")
+    public ResponseEntity<OrchestratorResponseDto> fabricReset() {
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        System.out.println("fabric reset");
+        try {
+            response = orchestratorService.requestResetFabric();
+        } catch (OpenDidException e) {
+            response.setStatus("ERROR");
+            return ResponseEntity.status(500).body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/startup/postgre")
     public ResponseEntity<OrchestratorResponseDto> postgreStartup() {
         OrchestratorResponseDto response = new OrchestratorResponseDto();

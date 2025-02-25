@@ -153,6 +153,34 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
     }
     return "FAIL";
   };
+  const resetRepository = async (repoId: string, fromUser: boolean = false) => {
+    const currentRepo = repositories.find((repo) => repo.id === repoId);
+    if (fromUser && currentRepo && currentRepo.status === "PROGRESS") {
+      alert("The operation is currently in progress. Please try again later.");
+      return;
+    }
+
+    setRepositories((prevRepos) =>
+      prevRepos.map((repo) =>
+        repo.id === repoId ? { ...repo, status: "PROGRESS" } : repo
+      )
+    );
+
+    try {
+      const response = await fetch(`/reset/${repoId}`, {
+        method: "GET",
+      });
+      if (response.ok) {
+        console.log(`Repository ${repoId} reset successfully`);
+      } else {
+        console.error(`Failed to reset repository ${repoId}`);
+      }
+    } catch (error) {
+      console.error("Error reset repository:", error);
+    }
+    // 내부 호출에서는 fromUser를 false로 전달하여 진행 중 체크를 건너뜁니다.
+    await healthCheck(repoId, false);
+  };
 
   // 모든 리포지토리에 대해 healthCheck를 실행하여 상태를 업데이트하고 전체 상태를 반환하는 함수
   const statusAll = async (): Promise<string> => {
@@ -230,6 +258,14 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
                   >
                     Status
                   </button>
+                  {repo.name === "Hyperledger Fabric" && (
+                  <button
+                    className="bg-blue-600 text-white px-3 py-1 rounded"
+                    onClick={() => resetRepository(repo.id, true)}
+                  >
+                    Reset
+                  </button>
+                  )}
                 </div>
               </td>
               <td className="p-2"></td>

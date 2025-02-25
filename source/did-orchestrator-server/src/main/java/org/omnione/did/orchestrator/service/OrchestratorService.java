@@ -31,6 +31,7 @@ public interface OrchestratorService {
     OrchestratorResponseDto requestStartupFabric();
     OrchestratorResponseDto requestShutdownFabric();
     OrchestratorResponseDto requestHealthCheckFabric();
+    OrchestratorResponseDto requestResetFabric();
 
     // PostgreSQL
     OrchestratorResponseDto requestStartupPostgre();

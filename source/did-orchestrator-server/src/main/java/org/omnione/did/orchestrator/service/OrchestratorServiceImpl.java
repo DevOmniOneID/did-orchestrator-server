@@ -320,6 +320,28 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     @Override
+    public OrchestratorResponseDto requestResetFabric() {
+        System.out.println("requestResetFabric");
+        OrchestratorResponseDto response = new OrchestratorResponseDto();
+        try {
+            String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
+            ProcessBuilder builder = new ProcessBuilder("sh", fabricShellPath + "/reset.sh");
+            builder.directory(new File(fabricShellPath));
+            Process process = builder.start();
+            String output = getProcessOutput(process);
+
+            if (output.contains("Removing generated chaincode docker images")) {
+                response.setStatus("UP");
+                return response;
+            }
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        response.setStatus("ERROR");
+        return response;
+    }
+    @Override
     public OrchestratorResponseDto requestStartupPostgre() {
         System.out.println("requestStartupPostgre");
         OrchestratorResponseDto response = new OrchestratorResponseDto();
