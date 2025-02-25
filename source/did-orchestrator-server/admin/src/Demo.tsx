@@ -178,7 +178,9 @@ const Demo = forwardRef((props, ref) => {
             <td className="p-2">
             {showDemoActionsAndInfo ? (
                 <div className="flex space-x-1">
-                  <button className="bg-gray-600 text-white px-3 py-1 rounded">
+                  <button className="bg-gray-600 text-white px-3 py-1 rounded"
+                    onClick={() => window.location.href = `http://localhost:${demo.port}`}
+                    >
                     Demo Site
                   </button>
               </div>
