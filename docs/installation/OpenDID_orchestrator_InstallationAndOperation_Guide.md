@@ -91,6 +91,29 @@ sudo systemctl enable docker
 
 ---
 
+## 6. Wallet 및 DID Document 생성
+전체 엔티티에 대한 월렛 및 DID Document 생성 또는 개별 엔티티별 월렛 및 DID Document 생성이 가능합니다.
+
+### 전체 엔티티에 대한 일괄 생성
+**Generate All** 버튼 클릭 후, 월렛 및 DID Document를 생성할 때 비밀번호만 입력하면 됩니다.
+각 엔티티의 이름을 기준으로 wallet과 DID Document가 자동 생성됩니다.
+
+### 개별 엔티티별 생성
+특정 엔티티의 Wallet 및 DID Document를 수동으로 생성하려면 Servers 탭에서 
+해당 엔티티의 Wallet버튼 및 DID Document 버튼을 클릭하면
+개별 엔티티의 Wallet 및 DID Document를 직접 생성할 수 있습니다.
+
+*생성한 Wallet은 각 엔티티 설정 페이지에서 월렛 경로 및 비밀번호를 지정하고 DID document는 엔티티 등록 시
+사용합니다.
+
+---
+
+## 7. TAS 개별 설정 및 가입증명서 발급
+Servers탭의 TAS의 Settings 버튼을 클릭하여 TAS 설정페이지로 이동합니다.
+설치 가이드를 참고하여 TAS의 개별 설정을 진행하고, 엔티티 등록 및 가입증명서 발급 절차를 수행합니다.
+
+---
+
 ## 추가 참고 사항
 
 - 각 서비스 및 엔티티의 구동이 정상적으로 실행되지 않는다면 로그를 확인 할 수 있습니다.
