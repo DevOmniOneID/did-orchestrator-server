@@ -58,7 +58,8 @@ OpenDID Orchestrator는 Hyperledger Fabric Network와 PostgreSQL DB를 사용합
 
 ### Windows
 1. [Docker Desktop](https://www.docker.com/products/docker-desktop)을 다운로드 및 설치합니다.  
-2. 설치 후 Docker Desktop을 실행합니다.  
+2. 설치 후 Docker Desktop을 실행합니다.
+3. [Fabric Install 가이드](https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html#wsl2)를 참고하여 WSL2를 설치합니다.
 
 ### macOS
 1. [Docker Desktop](https://www.docker.com/products/docker-desktop) 또는 [Colima](https://github.com/abiosoft/colima)를 설치합니다.  
