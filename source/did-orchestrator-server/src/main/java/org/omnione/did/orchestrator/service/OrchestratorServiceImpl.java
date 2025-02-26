@@ -18,6 +18,7 @@ package org.omnione.did.orchestrator.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.omnione.did.base.constant.Constant;
 import org.omnione.did.base.exception.ErrorCode;
 import org.omnione.did.base.exception.OpenDidException;
 import org.omnione.did.base.property.BlockchainProperties;
@@ -122,22 +123,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
     }
-
-    @Override
-    public OrchestratorResponseDto requestHealthCheckAll() {
-        OrchestratorResponseDto response = new OrchestratorResponseDto();
-        response.setStatus("Unknown error");
-        try {
-            for (String serverPort : SERVER_JARS.keySet()) {
-                isServerRunning(serverPort);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-
+    
     @Override
     public OrchestratorResponseDto requestStartup(String port) throws OpenDidException {
         OrchestratorResponseDto response = new OrchestratorResponseDto();
@@ -194,7 +180,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         System.out.println("requestStartupFabric");
         String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
         String logFilePath = LOGS_PATH + "/fabric.log";
-
+        
         try {
             ProcessBuilder chmodBuilder = new ProcessBuilder("chmod", "+x", fabricShellPath + "/start.sh");
             chmodBuilder.start().waitFor();
@@ -214,20 +200,16 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 public void onStartupComplete() {
                     System.out.println("Hyperledger Fabric is running successfully!");
                 }
+
                 @Override
                 public void onStartupFailed() {
                     System.out.println("Fabric startup failed.");
                 }
             });
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Fabric startup error: " + e.getMessage());
-        }
-
-        OrchestratorResponseDto response = requestHealthCheckFabric();
-            if(response.getStatus().equals("UP")){
-                // fabric.log 파일삭제
+            OrchestratorResponseDto response = requestHealthCheckFabric();
+//            if(response.getStatus().equals("UP")){
+            // fabric.log 파일삭제
 //                File logFile = new File(logFilePath);
 //                if (logFile.exists()) {
 //                    boolean deleted = logFile.delete();
@@ -237,8 +219,11 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 //                        System.out.println("Failed to delete fabric.log file.");
 //                    }
 //                }
-            }
-        return response;
+//            }
+            return response;
+        } catch (IOException | InterruptedException e) {
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
+        }
     }
 
     private void watchFabricLogs(String logFilePath, FabricStartupCallback callback) {
@@ -259,11 +244,11 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                     while ((line = reader.readLine()) != null) {
                         System.out.println(line);
 
-                        if (line.contains("Chaincode initialization is not required") || line.contains("starting checked")) {
+                        if (line.contains(Constant.FABRIC_SUCCESS_CHAINCODE_MESSAGE) || line.contains(Constant.FABRIC_START_MESSAGE)) {
                             callback.onStartupComplete();
                             return;
                         }
-                        if (line.contains("Deploying chaincode failed") || line.contains("Cannot connect to the Docker daemon")) {
+                        if (line.contains(Constant.FABRIC_FAIL_CHAINCODE_MESSAGE) || line.contains(Constant.FABRIC_FAIL_DOCKER_MESSAGE)) {
                             callback.onStartupFailed();
                             return;
                         }
@@ -272,8 +257,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 }
                 Thread.sleep(3000);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (InterruptedException | IOException e) {
             System.out.println("Log monitoring error: " + e.getMessage());
             callback.onStartupFailed();
         }
@@ -290,7 +274,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             builder.redirectError(ProcessBuilder.Redirect.INHERIT);
             builder.start();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         OrchestratorResponseDto response = requestHealthCheckFabric();
         return response;
@@ -313,7 +297,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             }
 
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("ERROR");
         return response;
@@ -330,13 +314,13 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             Process process = builder.start();
             String output = getProcessOutput(process);
 
-            if (output.contains("Removing generated chaincode docker images")) {
+            if (output.contains(Constant.FABRIC_RESET_MESSAGE)) {
                 response.setStatus("UP");
                 return response;
             }
 
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("ERROR");
         return response;
@@ -352,12 +336,12 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
             Process process = builder.start();
             String output = getProcessOutput(process);
-            if (output.contains("Started")) {
+            if (output.contains(Constant.POSTGRE_START_MESSAGE)) {
                 response.setStatus("UP");
                 return response;
             }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("ERROR");
         return response;
@@ -374,12 +358,12 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
             Process process = builder.start();
             String output = getProcessOutput(process);
-            if (output.contains("stop")) {
+            if (output.contains(Constant.POSTGRE_STOP_MESSAGE)) {
                 response.setStatus("DOWN");
                 return response;
             }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("ERROR");
         return response;
@@ -397,13 +381,13 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             Process process = builder.start();
             String output = getProcessOutput(process);
 
-            if (output.contains("All databases are successfully created")) {
+            if (output.contains(Constant.POSTGRE_HEALTH_MESSAGE)) {
                 response.setStatus("UP");
                 return response;
             }
 
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("ERROR");
         return response;
@@ -414,9 +398,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         System.out.println("createWallet : " + fileName + " / " + password);
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
-            String shellPath = System.getProperty("user.dir") + "/tool";
-            ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_wallet.sh", fileName);
-            builder.directory(new File(shellPath));
+            ProcessBuilder builder = new ProcessBuilder("sh", CLI_TOOL_DIR + "/create_wallet.sh", fileName);
+            builder.directory(new File(CLI_TOOL_DIR));
             builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.redirectError(ProcessBuilder.Redirect.INHERIT);
             Process process = builder.start();
@@ -436,7 +419,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 System.err.println("Wallet creation failed.");
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("ERROR");
         return response;
@@ -450,9 +434,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         try {
             for(int i = 0; i < keyIds.size(); i++) {
                 System.out.println("createKeys : " + fileName + " / " + password + " / " + keyIds.get(i));
-                String shellPath = System.getProperty("user.dir") + "/tool";
-                ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_keys.sh", fileName + ".wallet", keyIds.get(i));
-                builder.directory(new File(shellPath));
+                ProcessBuilder builder = new ProcessBuilder("sh", CLI_TOOL_DIR + "/create_keys.sh", fileName + ".wallet", keyIds.get(i));
+                builder.directory(new File(CLI_TOOL_DIR));
                 builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                 builder.redirectError(ProcessBuilder.Redirect.INHERIT);
 
@@ -474,8 +457,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 }
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            response.setStatus("ERROR");
+            System.err.println(e.getMessage());
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("SUCCESS");
         return response;
@@ -486,9 +469,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         System.out.println("createDidDocument : " + fileName + " / " + password + " / " + did + " / " + controller);
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
-            String shellPath = System.getProperty("user.dir") + "/tool";
-            ProcessBuilder builder = new ProcessBuilder("sh", shellPath + "/create_did_doc.sh", fileName + ".wallet", fileName + ".did", did, controller, type);
-            builder.directory(new File(shellPath));
+            ProcessBuilder builder = new ProcessBuilder("sh", CLI_TOOL_DIR + "/create_did_doc.sh", fileName + ".wallet", fileName + ".did", did, controller, type);
+            builder.directory(new File(CLI_TOOL_DIR));
             builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.redirectError(ProcessBuilder.Redirect.INHERIT);
 
@@ -510,7 +492,8 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             }
 
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("ERROR");
         return response;
@@ -537,7 +520,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 }
             }
         } catch (SocketException e) {
-            e.printStackTrace();
+            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         return "Unknown IP";
     }
@@ -560,7 +543,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 yamlData = loaded;
             }
         } catch (IOException e) {
-            response.setStatus("YAML 파일 읽기 오류: " + e.getMessage());
+            response.setStatus("YAML read error: " + e.getMessage());
         }
 
         mergeMaps(yamlData, updates);
@@ -568,7 +551,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         try (Writer writer = new FileWriter(YAML_FILE_PATH)) {
             yaml.dump(yamlData, writer);
         } catch (IOException e) {
-            response.setStatus("YAML 파일 쓰기 오류: " + e.getMessage());
+            response.setStatus("YAML write error: " + e.getMessage());
         }
 
         return response;
@@ -675,7 +658,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                     output.append(line).append("\n");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
             }
         });
 
@@ -687,7 +670,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                     output.append(line).append("\n");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
             }
         });
 

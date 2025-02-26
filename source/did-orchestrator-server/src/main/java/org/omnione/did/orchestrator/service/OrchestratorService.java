@@ -25,7 +25,6 @@ import java.util.Map;
 public interface OrchestratorService {
     void requestStartupAll();
     void requestShutdownAll();
-    OrchestratorResponseDto requestHealthCheckAll();
 
     //Hyperledger Fabric
     OrchestratorResponseDto requestStartupFabric();
