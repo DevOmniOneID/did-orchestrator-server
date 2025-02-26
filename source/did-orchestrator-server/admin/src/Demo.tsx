@@ -3,6 +3,7 @@ import HelpIcon from "./icons/HelpIcon";
 import showToolTip from "./Tooltip";
 import ProgressIcon from "./icons/ProgressIcon";
 import LogIcon from './icons/LogIcon';
+import { CSSTransition } from "react-transition-group";
 
 interface Demo {
   id: string;
@@ -49,6 +50,9 @@ const Demo = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     shouldRenderDemoActionsAndInfo,
+    startDemo,
+    stopDemo,
+    healthCheckDemo
   }));
 
   // DEMO의 상태를 체크하는 함수 (fromUser가 true이면 사용자가 직접 호출한 것으로 판단)
@@ -124,7 +128,7 @@ const Demo = forwardRef((props, ref) => {
           <button
             onClick={(e) =>
               showToolTip(
-                "You can control the Demo below once all the Servers above are running.<br>The Actions and Info will be activated at that time.",
+                "You can control the Demo below once all the Entities above are running.<br>The Actions, Info, and other items will be activated at that time.",
                 e
               )
             }
@@ -147,51 +151,74 @@ const Demo = forwardRef((props, ref) => {
         <tbody className="server-table">
         <tr className="border-b">
           <td className="p-2 pl-6 demo">
-            {demo.status === "PROGRESS" ? <ProgressIcon/> : demo.status}
+            <CSSTransition
+                in={showDemoActionsAndInfo}
+                timeout={300} // 300ms 애니메이션 지속
+                classNames="fade"
+                unmountOnExit
+            >
+              <div>
+                {demo.status === "PROGRESS" ? <ProgressIcon/> : demo.status}
+              </div>
+            </CSSTransition>
           </td>
-          <td className="p-2 font-bold"
-              onClick={() => window.open(`/logs/server_${demo.port}.log`)}
-          >
-            {demo.name} ({demo.port}) <button onClick={() => window.open(`/logs/server_${demo.port}.log`)}><LogIcon width="0.8em" height="0.8em"/></button>
+          <td className="p-2 font-bold">
+            <CSSTransition
+                in={showDemoActionsAndInfo}
+                timeout={300} // 300ms 애니메이션 지속
+                classNames="fade"
+                unmountOnExit
+            >
+              <div>
+                {demo.name} ({demo.port}) <button onClick={() => window.open(`/logs/server_${demo.port}.log`)}><LogIcon width="0.8em" height="0.8em"/></button>
+              </div>
+            </CSSTransition>
           </td>
           <td className="p-2">
-            {showDemoActionsAndInfo ? (
-                <div className="flex space-x-1">
+            <CSSTransition
+                in={showDemoActionsAndInfo}
+                timeout={300} // 300ms 애니메이션 지속
+                classNames="fade"
+                unmountOnExit
+            >
+              <div className="flex space-x-1">
                 <button
-                      className="bg-green-600 text-white px-3 py-1 rounded"
-                      onClick={() => startDemo(true)}
-                  >
-                    Start
-                  </button>
-                  <button
-                      className="bg-red-600 text-white px-3 py-1 rounded"
-                      onClick={() => stopDemo(true)}
-                  >
-                    Stop
-                  </button>
-                  <button
-                      className="bg-gray-600 text-white px-3 py-1 rounded"
-                      onClick={() => healthCheckDemo(true)}
-                  >
-                    Status
-                  </button>
-                </div>
-            ) : (
-                <>-</>
-            )}
+                    className="bg-green-600 text-white px-3 py-1 rounded"
+                    onClick={() => startDemo(true)}
+                >
+                  Start
+                </button>
+                <button
+                    className="bg-red-600 text-white px-3 py-1 rounded"
+                    onClick={() => stopDemo(true)}
+                >
+                  Stop
+                </button>
+                <button
+                    className="bg-gray-600 text-white px-3 py-1 rounded"
+                    onClick={() => healthCheckDemo(true)}
+                >
+                  Status
+                </button>
+              </div>
+            </CSSTransition>
           </td>
           <td className="p-2">
-            {showDemoActionsAndInfo ? (
-                <div className="flex space-x-1">
-                  <button className="bg-gray-600 text-white px-3 py-1 rounded"
-                          onClick={() => window.open(`http://localhost:${demo.port}`)}
-                  >
-                    Demo Site
-                  </button>
-                </div>
-            ) : (
-                <>-</>
-            )}
+            <CSSTransition
+                in={showDemoActionsAndInfo}
+                timeout={300} // 300ms 애니메이션 지속
+                classNames="fade"
+                unmountOnExit
+            >
+              <div className="flex space-x-1">
+                <button
+                    className="bg-gray-600 text-white px-3 py-1 rounded"
+                    onClick={() => window.open(`http://localhost:${demo.port}`)}
+                >
+                  Demo Site
+                </button>
+              </div>
+            </CSSTransition>
           </td>
           <td className="p-2"></td>
         </tr>

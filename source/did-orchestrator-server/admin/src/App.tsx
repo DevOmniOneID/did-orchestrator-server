@@ -295,6 +295,9 @@ const App: React.FC = () => {
 
   const demoRef = useRef<{
     shouldRenderDemoActionsAndInfo: () => boolean
+    startDemo: () => Promise<string>;
+    stopDemo: () => Promise<string>;
+    healthCheckDemo: () => Promise<string>;
   } | null>(null);
 
   // 모든 엔티티에 대해 순차적으로 시작 요청 시 진행 상태를 "PROGRESS"로 저장 후, 완료되면 "🟢"로 업데이트
@@ -310,6 +313,9 @@ const App: React.FC = () => {
     }
     if (serversRef.current) {
       await serversRef.current.startAll();
+    }
+    if (demoRef.current) {
+      await demoRef.current.startDemo();
     }
 
     statusAll();
@@ -329,6 +335,9 @@ const App: React.FC = () => {
     if (repositoriesRef.current) {
       await repositoriesRef.current.stopAll();
     }
+    if (demoRef.current) {
+      await demoRef.current.stopDemo();
+    }
 
     statusAll();
   };
@@ -342,6 +351,9 @@ const App: React.FC = () => {
     }
     if (repositoriesRef.current) {
       await repositoriesRef.current.statusAll();
+    }
+    if (demoRef.current) {
+      await demoRef.current.healthCheckDemo();
     }
 
     const repoStatus = repositoriesRef.current ? await repositoriesRef.current.getOverallStatus() : "FAIL";

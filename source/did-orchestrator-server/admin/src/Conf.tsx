@@ -122,6 +122,9 @@ const Conf: React.FC = () => {
       }
       console.log('Actuator refreshed successfully!');
 
+      // servers 로컬 스토리지 삭제
+      localStorage.removeItem("servers");
+
       alert('Config saved successfully!');
       window.location.reload();
     } catch (error) {

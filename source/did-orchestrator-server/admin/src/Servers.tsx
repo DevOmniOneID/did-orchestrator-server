@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
+import React, {useState, forwardRef, useImperativeHandle, useEffect, useRef} from "react";
 import HelpIcon from './icons/HelpIcon';
 import LogIcon from './icons/LogIcon';
 import showToolTip from "./Tooltip";
@@ -17,17 +17,35 @@ interface ServerProps {
   openPopupDid: (id: string) => void;
 }
 
-const defaultServers: Server[] = [
-  { id: "tas", name: "TAS", port: 8090, status: "⚪" },
-  { id: "issuer", name: "Issuer", port: 8091, status: "⚪" },
-  { id: "verifier", name: "Verifier", port: 8092, status: "⚪" },
-  { id: "cas", name: "CAS", port: 8094, status: "⚪" },
-  { id: "wallet", name: "Wallet Service", port: 8095, status: "⚪" },
-  { id: "api", name: "API Server", port: 8093, status: "⚪" }
-];
-
 const Servers = forwardRef((props: ServerProps, ref) => {
   const { openPopupWallet, openPopupDid } = props;
+
+  const fetchServers = (): Server[] => {
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "/configs", false); // 동기 요청
+      xhr.send();
+
+      if (xhr.status !== 200) {
+        throw new Error("Failed to fetch server configurations");
+      }
+
+      const data = JSON.parse(xhr.responseText);
+
+      return Object.entries(data.services.server)
+      .filter(([key, _]) => key !== "demo") // "demo" 키 제외
+      .map(([key, value]: [string, any]) => ({
+        id: key,
+        name: value.name,
+        port: value.port,
+        status: "⚪"
+      }))
+      .sort((a, b) => (a.id === "api" ? 1 : b.id === "api" ? -1 : 0)); // "api"를 마지막으로 이동
+    } catch (error) {
+      console.error("Error fetching server configurations:", error);
+      return [];
+    }
+  };
 
   // 초기 상태를 localStorage에서 불러오며, 없으면 defaultServers 사용
   const [servers, setServers] = useState<Server[]>(() => {
@@ -37,10 +55,10 @@ const Servers = forwardRef((props: ServerProps, ref) => {
         return JSON.parse(stored) as Server[];
       } catch (e) {
         console.error("Error parsing servers from localStorage", e);
-        return defaultServers;
+        return fetchServers();
       }
     }
-    return defaultServers;
+    return fetchServers();
   });
 
   // 상태 변경 시 localStorage에 저장

@@ -5,7 +5,7 @@ const HelpMarkdown: React.FC = () => {
   const [markdownContent, setMarkdownContent] = useState<string>("");
 
   useEffect(() => {
-    fetch("https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-frontend/refs/heads/main/readme.md")
+    fetch("https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/orchestrator_manual.md")
       .then((res) => res.text())
       .then((text) => setMarkdownContent(text))
       .catch((err) => console.error("Error fetching markdown:", err));
