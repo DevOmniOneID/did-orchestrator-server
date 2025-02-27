@@ -11,7 +11,7 @@
 ## 3. 화면 구성
 Orchestrator의 화면은 다음과 같은 주요 섹션으로 구성됩니다.
 
-![freepik license](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/orchestrator.png)
+![화면 구성](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/orchestrator.png)
 
 
 ### 3.1 Quick Start
@@ -83,4 +83,4 @@ Orchestrator의 화면은 다음과 같은 주요 섹션으로 구성됩니다.
 - **개별 엔티티 설정**: `Settings` 버튼을 통해 개별 서버의 상세 설정을 조정할 수 있습니다.
 - **보안**: Wallet 및 DID Document 생성 시 비밀번호를 안전하게 관리해야 합니다.
 
-*Orchestrator는 개별 엔티티의 구동 및 모니터링을 목적으로 사용되며, 각 개별 엔티티의 설정은 개별 엔티티의 설정페이지를 통해 수행해야합니다.
+*Orchestrator는 개별 엔티티의 구동 및 모니터링을 목적으로 사용되며, 각 개별 엔티티의 설정은 개별 엔티티의 설정 페이지를 통해 수행해야 합니다.
