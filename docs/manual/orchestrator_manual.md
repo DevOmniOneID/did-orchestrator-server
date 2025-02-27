@@ -11,7 +11,7 @@ This document includes descriptions of the layout and features of the Orchestrat
 ## 2. Screen Layout
 The Orchestrator screen is composed of the following key areas.
 
-![freepik license](https://github.com/DevOmniOneID/did-orchestrator-server/blob/main/docs/manual/orchestrator.png)
+![freepik license](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/orchestrator.png)
 
 ### 2.1 Quick Start
 Provides **Start All** and **Stop All** functions for all entities.
