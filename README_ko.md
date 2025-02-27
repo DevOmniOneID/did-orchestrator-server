@@ -73,7 +73,7 @@ did-orchestrator-server
 ## 설치 및 운영 가이드
 
 Orchestrator 서버의 설치 및 구성에 대한 자세한 지침은 아래 가이드를 참조하십시오:
-- [OpenDID Orchestrator 서버 설치 및 운영 가이드](docs/installation/OpenDID_OrchestratorServer_InstallationAndOperation_Guide.md)  
+- [OpenDID Orchestrator 서버 설치 및 운영 가이드](docs/installation/OpenDID_orchestrator_InstallationAndOperation_Guide_ko.md)  
 
 ## API 참고 문서
 
@@ -83,7 +83,7 @@ Orchestrator 서버의 설치 및 구성에 대한 자세한 지침은 아래 �
 ## Change Log
 
 Change Log에는 버전별 변경 사항과 업데이트가 자세히 기록되어 있습니다. 다음에서 확인할 수 있습니다:
-- [Change Log](./CHANGELOG.md)  
+- [Change Log](CHANGELOG.md)  
 
 ## OpenDID 시연 영상
 
