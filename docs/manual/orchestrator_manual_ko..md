@@ -30,7 +30,6 @@ Orchestrator의 화면은 다음과 같은 주요 섹션으로 구성됩니다.
 
 - **Wallet 및 DID Document 생성**:
   - 비밀번호를 입력하면 각 엔티티의 이름으로 Wallet과 DID Document가 생성됩니다.
-  - 
 ![Generate All 화면](https://github.com/DevOmniOneID/did-orchestrator-server/blob/main/docs/manual/generate_all.png)
 
 
