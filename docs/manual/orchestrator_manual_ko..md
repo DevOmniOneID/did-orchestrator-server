@@ -31,7 +31,7 @@ Orchestrator의 화면은 다음과 같은 주요 섹션으로 구성됩니다.
 - **Wallet 및 DID Document 생성**:
   - 비밀번호를 입력하면 각 엔티티의 이름으로 Wallet과 DID Document가 생성됩니다.
 
-![Generate All 화면](https://github.com/DevOmniOneID/did-orchestrator-server/blob/main/docs/manual/generate_all.png)
+![Generate All 화면](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/generate_all.png)
 
 
 ### 3.2 Repositories
@@ -70,13 +70,13 @@ Orchestrator의 화면은 다음과 같은 주요 섹션으로 구성됩니다.
 - **Wallet 생성**:
   - Wallet의 이름과 비밀번호를 입력하여 해당 엔티티의 Wallet을 생성합니다.
 
-![Wallet 생성 화면](https://github.com/DevOmniOneID/did-orchestrator-server/blob/main/docs/manual/wallet.png)
+![Wallet 생성 화면](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/wallet.png)
 
 
 - **DID Document 생성**:
   - 생성한 Wallet과 동일한 이름, DID, 비밀번호를 입력하여 해당 엔티티의 DID Document를 생성합니다.
 
-![DID Document 생성 화면](https://github.com/DevOmniOneID/did-orchestrator-server/blob/main/docs/manual/diddoc.png)
+![DID Document 생성 화면](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/diddoc.png)
 
 ## 4. 주의사항
 - **서버 실행/종료 시간**: `Start` 또는 `Stop` 버튼을 사용할 경우, 서버 실행 환경에 따라 일정 시간이 소요될 수 있습니다.
