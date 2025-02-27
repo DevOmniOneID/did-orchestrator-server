@@ -18,6 +18,7 @@ package org.omnione.did.base.exception;
 
 public enum ErrorCode {
     UNKNOWN_SERVER_ERROR("9999", "An unknown server error has occurred.", 500),
+    INVALID_PORT_NUMBER("1000","Invalid port number.", 400),
     JSON_PROCESSING_ERROR("8004", "Error occurred while processing JSON data.", 400),
     ;
 

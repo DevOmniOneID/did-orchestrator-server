@@ -258,7 +258,6 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 Thread.sleep(3000);
             }
         } catch (InterruptedException | IOException e) {
-            System.out.println("Log monitoring error: " + e.getMessage());
             callback.onStartupFailed();
         }
     }
@@ -397,32 +396,61 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     public OrchestratorResponseDto createWallet(String fileName, String password) {
         System.out.println("createWallet : " + fileName + " / " + password);
         OrchestratorResponseDto response = new OrchestratorResponseDto();
+
+        Process process = null;
+        BufferedWriter writer = null;
+        OutputStreamWriter outputStreamWriter = null;
+
         try {
+
             ProcessBuilder builder = new ProcessBuilder("sh", CLI_TOOL_DIR + "/create_wallet.sh", fileName);
             builder.directory(new File(CLI_TOOL_DIR));
             builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-            Process process = builder.start();
 
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
-                writer.write(password);
-                writer.newLine();
-                writer.flush();
-            }
+            process = builder.start();
+
+            outputStreamWriter = new OutputStreamWriter(process.getOutputStream());
+            writer = new BufferedWriter(outputStreamWriter);
+
+            writer.write(password);
+            writer.newLine();
+            writer.flush();
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
                 System.out.println("Wallet creation successful.");
-                response.setStatus("SUCCESS");
-                return response;
             } else {
-                System.err.println("Wallet creation failed.");
+                System.out.println("Wallet creation failed.");
+                response.setStatus("ERROR");
+                return response;
             }
+
         } catch (IOException | InterruptedException e) {
-            System.err.println(e.getMessage());
             throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    System.out.println("Error closing BufferedWriter.");
+                }
+            }
+
+            if (outputStreamWriter != null) {
+                try {
+                    outputStreamWriter.close();
+                } catch (IOException e) {
+                    System.out.println("Error closing OutputStreamWriter.");
+                }
+            }
+
+            if (process != null) {
+                process.destroy();
+            }
         }
-        response.setStatus("ERROR");
+
+        response.setStatus("SUCCESS");
         return response;
     }
 
@@ -431,34 +459,60 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         System.out.println("createKeys : " + fileName + " / " + password);
         OrchestratorResponseDto response = new OrchestratorResponseDto();
 //        String[] keyId = {"assert", "auth", "keyagree", "invoke"};
-        try {
-            for(int i = 0; i < keyIds.size(); i++) {
+        Process process = null;
+        BufferedWriter writer = null;
+        OutputStreamWriter outputStreamWriter = null;
+        for(int i = 0; i < keyIds.size(); i++) {
+            try {
                 System.out.println("createKeys : " + fileName + " / " + password + " / " + keyIds.get(i));
                 ProcessBuilder builder = new ProcessBuilder("sh", CLI_TOOL_DIR + "/create_keys.sh", fileName + ".wallet", keyIds.get(i));
                 builder.directory(new File(CLI_TOOL_DIR));
                 builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                 builder.redirectError(ProcessBuilder.Redirect.INHERIT);
 
-                Process process = builder.start();
+                process = builder.start();
 
-                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
-                    writer.write(password);
-                    writer.newLine();
-                    writer.flush();
-                }
+                outputStreamWriter = new OutputStreamWriter(process.getOutputStream());
+                writer = new BufferedWriter(outputStreamWriter);
+
+                writer.write(password);
+                writer.newLine();
+                writer.flush();
 
                 int exitCode = process.waitFor();
                 if (exitCode == 0) {
                     System.out.println("Keypair creation successful.");
                 } else {
-                    System.err.println("Keypair creation failed.");
+                    System.out.println("Keypair creation failed.");
                     response.setStatus("ERROR");
                     return response;
                 }
+                if (process.isAlive()) {
+                    process.destroy();
+                }
+            } catch (IOException | InterruptedException e) {
+                throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (IOException e) {
+                        System.out.println("Error closing BufferedWriter.");
+                    }
+                }
+
+                if (outputStreamWriter != null) {
+                    try {
+                        outputStreamWriter.close();
+                    } catch (IOException e) {
+                        System.out.println("Error closing OutputStreamWriter.");
+                    }
+                }
+
+                if (process != null) {
+                    process.destroy();
+                }
             }
-        } catch (IOException | InterruptedException e) {
-            System.err.println(e.getMessage());
-            throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
         response.setStatus("SUCCESS");
         return response;
@@ -468,19 +522,25 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     public OrchestratorResponseDto createDidDocument(String fileName, String password, String did, String controller, String type) {
         System.out.println("createDidDocument : " + fileName + " / " + password + " / " + did + " / " + controller);
         OrchestratorResponseDto response = new OrchestratorResponseDto();
+
+        Process process = null;
+        BufferedWriter writer = null;
+        OutputStreamWriter outputStreamWriter = null;
+
         try {
             ProcessBuilder builder = new ProcessBuilder("sh", CLI_TOOL_DIR + "/create_did_doc.sh", fileName + ".wallet", fileName + ".did", did, controller, type);
             builder.directory(new File(CLI_TOOL_DIR));
             builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             builder.redirectError(ProcessBuilder.Redirect.INHERIT);
 
-            Process process = builder.start();
+            process = builder.start();
 
-            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()))) {
-                writer.write(password);
-                writer.newLine();
-                writer.flush();
-            }
+            outputStreamWriter = new OutputStreamWriter(process.getOutputStream());
+            writer = new BufferedWriter(outputStreamWriter);
+
+            writer.write(password);
+            writer.newLine();
+            writer.flush();
 
             int exitCode = process.waitFor();
             if (exitCode == 0) {
@@ -488,12 +548,33 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 response.setStatus("SUCCESS");
                 return response;
             } else {
-                System.err.println("DID Documents creation failed.");
+                System.out.println("DID Documents creation failed.");
             }
 
         } catch (IOException | InterruptedException e) {
-            System.err.println(e.getMessage());
             throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
+        } finally {
+
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    System.out.println("Error closing BufferedWriter.");
+                }
+            }
+
+            if (outputStreamWriter != null) {
+                try {
+                    outputStreamWriter.close();
+                } catch (IOException e) {
+                    System.out.println("Error closing OutputStreamWriter.");
+                }
+            }
+
+            if (process != null) {
+                process.destroy();
+            }
+
         }
         response.setStatus("ERROR");
         return response;
@@ -576,22 +657,18 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
     private String startServer(String port) throws IOException, InterruptedException {
-        String jarFileName = SERVER_JARS.get(port);
-        String jarFolderName = SERVER_JARS_FOLDER.get(port);
-        File jarFile = new File(JARS_DIR + "/" + jarFolderName + "/" + jarFileName);
+        String jarFilePath = JARS_DIR + "/" + SERVER_JARS_FOLDER.get(port) + "/" + SERVER_JARS.get(port);
+        File jarFile = new File(jarFilePath);
+        File scriptFile = new File(JARS_DIR + "/start.sh");
+        String serverPort = "";
+        if (Integer.parseInt(port) > 0 && Integer.parseInt(port) < 65535)
+            serverPort = port;
 
-        if (!jarFile.exists()) {
-            System.err.println("JAR file not found: " + jarFile.getAbsolutePath());
-            return "ERROR";
-        }
-
-        ProcessBuilder builder = new ProcessBuilder(
-                "sh", "-c", "nohup java -jar " + jarFile.getAbsolutePath() + " >  " + LOGS_PATH + "/server_" + port + ".log 2>&1 &"
-        );
+        ProcessBuilder builder = new ProcessBuilder("sh", scriptFile.getAbsolutePath(), jarFile.getAbsolutePath(), serverPort);
         builder.directory(new File(JARS_DIR));
         builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         builder.redirectError(ProcessBuilder.Redirect.INHERIT);
-        builder.start();
+        Process process = builder.start();
 
         System.out.println("Server on port " + port + " started with nohup! Waiting for health check...");
 
@@ -606,6 +683,43 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         System.err.println("Server on port " + port + " failed to start.");
         return "DOWN";
     }
+
+//    private String startServer(String port) throws IOException, InterruptedException {
+//        if (Integer.parseInt(port) < 0 || Integer.parseInt(port) > 65535) {
+//            System.out.println("Invalid port: " + port);
+//            return "ERROR";
+//        }
+//        String jarFileName = SERVER_JARS.get(port);
+//        String jarFolderName = SERVER_JARS_FOLDER.get(port);
+//        String logFileName = LOGS_PATH + "/server_" + port;
+//        File jarFile = new File(JARS_DIR + "/" + jarFolderName + "/" + jarFileName);
+//
+//        if (!jarFile.exists()) {
+//            System.out.println("JAR file not found: " + jarFile.getAbsolutePath());
+//            return "ERROR";
+//        }
+//
+//        ProcessBuilder builder = new ProcessBuilder(
+//                "sh", "-c", "nohup java -jar " + jarFile.getAbsolutePath() + " >  " + logFileName + ".log 2>&1 &"
+//        );
+//        builder.directory(new File(JARS_DIR));
+//        builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+//        builder.redirectError(ProcessBuilder.Redirect.INHERIT);
+//        builder.start();
+//
+//        System.out.println("Server on port " + port + " started with nohup! Waiting for health check...");
+//
+//        int retries = 5;
+//        while (retries-- > 0) {
+//            Thread.sleep(1000);
+//            if (isServerRunning(port)) {
+//                System.out.println("Server on port " + port + " is running!");
+//                return "UP";
+//            }
+//        }
+//        System.out.println("Server on port " + port + " failed to start.");
+//        return "DOWN";
+//    }
 
     private String stopServer(String port) throws InterruptedException {
 
@@ -624,13 +738,14 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 return "UP";
             }
         }
-        System.err.println("Server on port " + port + " failed to start.");
+        System.out.println("Server on port " + port + " failed to start.");
         return "DOWN";
     }
     private boolean isServerRunning(String port) {
+        HttpURLConnection connection = null;
         try {
             URL url = new URL(getServerUrl() + port + "/actuator/health");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(3000);
             connection.setReadTimeout(3000);
@@ -638,8 +753,12 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             int responseCode = connection.getResponseCode();
             System.out.println("running code : " + responseCode);
             return (responseCode == 200);
-        } catch (Exception e) {
+        } catch (IOException e) {
             return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 
@@ -666,7 +785,7 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
                 String line;
                 while ((line = errorReader.readLine()) != null) {
-                    System.err.println("[OUTPUT] " + line);
+                    System.out.println("[OUTPUT] " + line);
                     output.append(line).append("\n");
                 }
             } catch (IOException e) {
@@ -687,31 +806,31 @@ public class OrchestratorServiceImpl implements OrchestratorService{
     }
 
 
-    private boolean isPostgreSQLRunning() {
-        System.out.println("isPostgreSQLRunning");
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("PostgreSQL is running");
-        String JDBC_URL = "jdbc:postgresql://localhost:5432/omn";
-        String JDBC_USER = "omn";
-        String JDBC_PASSWORD = "omn";
-
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT version();")) {
-
-            if (resultSet.next()) {
-                System.out.println("PostgreSQL is running: " + resultSet.getString(1));
-                return true;
-            }
-        } catch (Exception e) {
-            System.err.println("PostgreSQL is not running: " + e.getMessage());
-        }
-        return false;
-    }
+//    private boolean isPostgreSQLRunning() {
+//        System.out.println("isPostgreSQLRunning");
+//        try {
+//            Class.forName("org.postgresql.Driver");
+//        } catch (ClassNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
+//        System.out.println("PostgreSQL is running");
+//        String JDBC_URL = "jdbc:postgresql://localhost:5432/omn";
+//        String JDBC_USER = "omn";
+//        String JDBC_PASSWORD = "omn";
+//
+//        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+//             Statement statement = connection.createStatement();
+//             ResultSet resultSet = statement.executeQuery("SELECT version();")) {
+//
+//            if (resultSet.next()) {
+//                System.out.println("PostgreSQL is running: " + resultSet.getString(1));
+//                return true;
+//            }
+//        } catch (OpenDidException e) {
+//            System.err.println("PostgreSQL is not running: " + e.getMessage());
+//        }
+//        return false;
+//    }
 }
 
 
