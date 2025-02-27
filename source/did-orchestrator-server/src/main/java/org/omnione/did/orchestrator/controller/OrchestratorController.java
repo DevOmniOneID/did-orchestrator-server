@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,6 +211,18 @@ public class OrchestratorController {
             return ResponseEntity.status(500).body(response);
         }
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/create/all")
+    public ResponseEntity<OrchestratorResponseDto> createAll(@RequestBody OrchestratorRequestDto request) {
+        try{
+            OrchestratorResponseDto result = orchestratorService.createAll(request.getPassword());
+            return ResponseEntity.ok(result);
+        } catch (OpenDidException e) {
+            OrchestratorResponseDto errorResponse = new OrchestratorResponseDto();
+            errorResponse.setStatus("ERROR");
+            return ResponseEntity.status(500).body(errorResponse);
+        }
     }
 
     @PostMapping("/create/wallet")

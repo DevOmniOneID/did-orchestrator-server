@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 OmniOne.
+ * Copyright 2025 OmniOne.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ public interface OrchestratorService {
     OrchestratorResponseDto requestHealthCheck(String port) throws OpenDidException;
     OrchestratorResponseDto requestRefresh(String port);
 
+    OrchestratorResponseDto createAll(String password);
     OrchestratorResponseDto createWallet(String fileName, String password);
     OrchestratorResponseDto createKeys(String fileName, String password, List<String> keyIds);
     OrchestratorResponseDto createDidDocument(String fileName, String password, String did, String controller, String type);
