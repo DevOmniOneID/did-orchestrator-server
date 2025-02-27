@@ -1,6 +1,5 @@
-# DID Orchestrator Server
-
----
+DID Orchestrator Server
+==
 
 DID Orchestrator 서버 Repository에 오신 것을 환영합니다. <br>
 이 Repository는 DID Orchestrator 서버의 소스 코드, 문서, 관련 리소스를 포함하고 있습니다.
