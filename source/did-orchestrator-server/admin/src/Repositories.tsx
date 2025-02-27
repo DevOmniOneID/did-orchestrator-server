@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import ProgressIcon from "./icons/ProgressIcon";
 import LogIcon from "./icons/LogIcon";
@@ -5,7 +21,6 @@ import LogIcon from "./icons/LogIcon";
 interface Repository {
   id: string;
   name: string;
-  // "⚪", "🟢", "🔴"와 진행 중일 경우 "PROGRESS" 값을 사용합니다.
   status: string;
 }
 
@@ -17,7 +32,6 @@ const defaultRepos: Repository[] = [
 ];
 
 const Repositories = forwardRef((props: RepositoriesProps, ref) => {
-  // 초기 상태는 localStorage에서 불러오고, 없으면 defaultRepos 사용
   const [repositories, setRepositories] = useState<Repository[]>(() => {
     const stored = localStorage.getItem("repositories");
     if (stored) {
@@ -31,12 +45,10 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
     return defaultRepos;
   });
 
-  // repositories 상태가 변경될 때마다 localStorage에 저장
   useEffect(() => {
     localStorage.setItem("repositories", JSON.stringify(repositories));
   }, [repositories]);
 
-  // fromUser가 true이면 사용자 직접 호출로 간주하여 진행 중 체크를 합니다.
   const healthCheck = async (repoId: string, fromUser: boolean = false) => {
     const currentRepo = repositories.find((repo) => repo.id === repoId);
     if (fromUser && currentRepo && currentRepo.status === "PROGRESS") {
@@ -103,7 +115,6 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
       console.error("Error starting repository:", error);
     }
 
-    // 내부 호출에서는 fromUser를 false로 전달하여 진행 중 체크를 건너뜁니다.
     await healthCheck(repoId, false);
   };
 
@@ -133,11 +144,9 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
       console.error("Error stopping repository:", error);
     }
 
-    // 내부 호출에서는 fromUser를 false로 전달하여 진행 중 체크를 건너뜁니다.
     await healthCheck(repoId, false);
   };
 
-  // 전체 상태를 결정하는 함수
   const getOverallStatus = async (): Promise<string> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -179,11 +188,9 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
     } catch (error) {
       console.error("Error reset repository:", error);
     }
-    // 내부 호출에서는 fromUser를 false로 전달하여 진행 중 체크를 건너뜁니다.
     await healthCheck(repoId, false);
   };
 
-  // 모든 리포지토리에 대해 healthCheck를 실행하여 상태를 업데이트하고 전체 상태를 반환하는 함수
   const statusAll = async (): Promise<string> => {
     for (const repo of repositories) {
       await healthCheck(repo.id);
@@ -238,7 +245,6 @@ const Repositories = forwardRef((props: RepositoriesProps, ref) => {
               </td>
               <td className="p-2">
                 <div className="flex space-x-1">
-                  {/* onClick 핸들러에서는 단순히 함수 호출만 합니다. */}
                   <button
                     className="bg-green-600 text-white px-3 py-1 rounded"
                     onClick={() => startRepository(repo.id, true)}

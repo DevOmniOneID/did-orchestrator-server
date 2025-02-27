@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React, { useState, useEffect } from 'react';
 import HelpIcon from './icons/HelpIcon';
 import showToolTip from "./Tooltip";
@@ -20,7 +36,6 @@ interface Config {
 
 const Conf: React.FC = () => {
   const [config, setConfig] = useState<Config | null>(null);
-  // isSaving 상태: Save 작업이 진행되는 동안 progress overlay를 표시하기 위한 상태
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -40,7 +55,6 @@ const Conf: React.FC = () => {
     fetchConfig();
   }, []);
 
-  // blockchain, database의 값 변경 핸들러 (동적 key)
   const handleConfigChange = (
     section: 'blockchain' | 'database',
     key: string,
@@ -56,7 +70,6 @@ const Conf: React.FC = () => {
     });
   };
 
-  // services 내 경로(key) 값 변경 핸들러
   const handleServicesPathChange = (
     key: string,
     e: React.ChangeEvent<HTMLInputElement>
@@ -71,7 +84,6 @@ const Conf: React.FC = () => {
     });
   };
 
-  // services.server 내 값 변경 핸들러
   const handleServerChange = (
     serverKey: string,
     field: 'name' | 'port' | 'file',
@@ -93,10 +105,9 @@ const Conf: React.FC = () => {
     });
   };
 
-  // Save 버튼 클릭 시 config state를 JSON으로 전송하고, 완료 전까지 progress overlay 표시
   const handleSave = async () => {
     if (!config) return;
-    setIsSaving(true); // 작업 시작 -> overlay 표시
+    setIsSaving(true);
     try {
       const updateResponse = await fetch('/configs', {
         method: 'POST',
@@ -110,10 +121,8 @@ const Conf: React.FC = () => {
       }
       console.log('Config saved successfully!');
 
-      // 1초 대기
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // /actuator/refresh 호출
       const refreshResponse = await fetch('/actuator/refresh', {
         method: 'POST',
       });
@@ -122,7 +131,6 @@ const Conf: React.FC = () => {
       }
       console.log('Actuator refreshed successfully!');
 
-      // servers 로컬 스토리지 삭제
       localStorage.removeItem("servers");
 
       alert('Config saved successfully!');
@@ -130,7 +138,7 @@ const Conf: React.FC = () => {
     } catch (error) {
       console.error('Error updating config:', error);
     } finally {
-      setIsSaving(false); // 작업 종료 -> overlay 숨김
+      setIsSaving(false);
     }
   };
 
@@ -140,7 +148,6 @@ const Conf: React.FC = () => {
     );
   }
 
-  // services 내 server 외의 key (경로들)
   const servicePathKeys = Object.keys(config.services).filter(
     key => key !== 'server'
   );
@@ -204,6 +211,7 @@ const Conf: React.FC = () => {
                             className="border rounded p-2 w-full"
                             value={value}
                             onChange={(e) => handleConfigChange('blockchain', key, e)}
+                            maxLength={30}
                           />
                         </td>
                       </tr>
@@ -244,6 +252,7 @@ const Conf: React.FC = () => {
                             className="border rounded p-2 w-full"
                             value={value}
                             onChange={(e) => handleConfigChange('database', key, e)}
+                            maxLength={30}
                           />
                         </td>
                       </tr>
@@ -290,6 +299,7 @@ const Conf: React.FC = () => {
                             className="border rounded p-2 w-full"
                             value={service.name}
                             onChange={(e) => handleServerChange(key, 'name', e)}
+                            maxLength={30}
                           />
                         </td>
                         <td className="p-2">
@@ -298,6 +308,7 @@ const Conf: React.FC = () => {
                             className="border rounded p-2 w-full"
                             value={service.port}
                             onChange={(e) => handleServerChange(key, 'port', e)}
+                            maxLength={30}
                           />
                         </td>
                         <td className="p-2">
@@ -306,6 +317,7 @@ const Conf: React.FC = () => {
                             className="border rounded p-2 w-full"
                             value={service.file}
                             onChange={(e) => handleServerChange(key, 'file', e)}
+                            maxLength={50}
                           />
                         </td>
                       </tr>
@@ -346,6 +358,7 @@ const Conf: React.FC = () => {
                             className="border rounded p-2 w-full"
                             value={config.services[key]}
                             onChange={(e) => handleServicesPathChange(key, e)}
+                            maxLength={30}
                           />
                         </td>
                       </tr>

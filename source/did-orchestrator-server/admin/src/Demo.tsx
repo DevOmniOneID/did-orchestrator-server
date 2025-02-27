@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import HelpIcon from "./icons/HelpIcon";
 import showToolTip from "./Tooltip";
@@ -33,14 +49,13 @@ const Demo = forwardRef((props, ref) => {
     return defaultDemo;
   });
 
-  const [showDemoActionsAndInfo, setShowDemoActionsAndInfo] = useState(false); // 버튼 표시 여부 상태
+  const [showDemoActionsAndInfo, setShowDemoActionsAndInfo] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("demo", JSON.stringify(demo));
     shouldRenderDemoActionsAndInfo();
   }, [demo]);
 
-  // 특정 조건에 따라 버튼 영역 활성화 여부를 판단하는 함수
   const shouldRenderDemoActionsAndInfo = async (): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -55,7 +70,6 @@ const Demo = forwardRef((props, ref) => {
     healthCheckDemo
   }));
 
-  // DEMO의 상태를 체크하는 함수 (fromUser가 true이면 사용자가 직접 호출한 것으로 판단)
   const healthCheckDemo = async (fromUser: boolean = false) => {
     if (fromUser && demo.status === "PROGRESS") {
       alert("The operation is currently in progress. Please try again later.");
@@ -80,7 +94,6 @@ const Demo = forwardRef((props, ref) => {
     }
   };
 
-  // DEMO를 시작하는 함수
   const startDemo = async (fromUser: boolean = false) => {
     if (fromUser && demo.status === "PROGRESS") {
       alert("The operation is currently in progress. Please try again later.");
@@ -100,7 +113,6 @@ const Demo = forwardRef((props, ref) => {
     await healthCheckDemo(false);
   };
 
-  // DEMO를 중지하는 함수
   const stopDemo = async (fromUser: boolean = false) => {
     if (fromUser && demo.status === "PROGRESS") {
       alert("The operation is currently in progress. Please try again later.");
@@ -153,7 +165,7 @@ const Demo = forwardRef((props, ref) => {
           <td className="p-2 pl-6 demo">
             <CSSTransition
                 in={showDemoActionsAndInfo}
-                timeout={300} // 300ms 애니메이션 지속
+                timeout={300}
                 classNames="fade"
                 unmountOnExit
             >
@@ -165,7 +177,7 @@ const Demo = forwardRef((props, ref) => {
           <td className="p-2 font-bold">
             <CSSTransition
                 in={showDemoActionsAndInfo}
-                timeout={300} // 300ms 애니메이션 지속
+                timeout={300}
                 classNames="fade"
                 unmountOnExit
             >
@@ -177,7 +189,7 @@ const Demo = forwardRef((props, ref) => {
           <td className="p-2">
             <CSSTransition
                 in={showDemoActionsAndInfo}
-                timeout={300} // 300ms 애니메이션 지속
+                timeout={300}
                 classNames="fade"
                 unmountOnExit
             >
@@ -206,7 +218,7 @@ const Demo = forwardRef((props, ref) => {
           <td className="p-2">
             <CSSTransition
                 in={showDemoActionsAndInfo}
-                timeout={300} // 300ms 애니메이션 지속
+                timeout={300}
                 classNames="fade"
                 unmountOnExit
             >

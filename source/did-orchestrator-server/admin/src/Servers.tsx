@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React, {useState, forwardRef, useImperativeHandle, useEffect, useRef} from "react";
 import HelpIcon from './icons/HelpIcon';
 import LogIcon from './icons/LogIcon';
@@ -8,7 +24,6 @@ interface Server {
   id: string;
   name: string;
   port: number;
-  // 상태는 "⚪", "🟢", "🔴", 진행 중일 경우 "PROGRESS" 값을 사용합니다.
   status: string;
 }
 
@@ -23,7 +38,7 @@ const Servers = forwardRef((props: ServerProps, ref) => {
   const fetchServers = (): Server[] => {
     try {
       const xhr = new XMLHttpRequest();
-      xhr.open("GET", "/configs", false); // 동기 요청
+      xhr.open("GET", "/configs", false);
       xhr.send();
 
       if (xhr.status !== 200) {
@@ -33,21 +48,20 @@ const Servers = forwardRef((props: ServerProps, ref) => {
       const data = JSON.parse(xhr.responseText);
 
       return Object.entries(data.services.server)
-      .filter(([key, _]) => key !== "demo") // "demo" 키 제외
+      .filter(([key, _]) => key !== "demo")
       .map(([key, value]: [string, any]) => ({
         id: key,
         name: value.name,
         port: value.port,
         status: "⚪"
       }))
-      .sort((a, b) => (a.id === "api" ? 1 : b.id === "api" ? -1 : 0)); // "api"를 마지막으로 이동
+      .sort((a, b) => (a.id === "api" ? 1 : b.id === "api" ? -1 : 0));
     } catch (error) {
       console.error("Error fetching server configurations:", error);
       return [];
     }
   };
 
-  // 초기 상태를 localStorage에서 불러오며, 없으면 defaultServers 사용
   const [servers, setServers] = useState<Server[]>(() => {
     const stored = localStorage.getItem("servers");
     if (stored) {
@@ -61,12 +75,10 @@ const Servers = forwardRef((props: ServerProps, ref) => {
     return fetchServers();
   });
 
-  // 상태 변경 시 localStorage에 저장
   useEffect(() => {
     localStorage.setItem("servers", JSON.stringify(servers));
   }, [servers]);
 
-  // fromUser가 true일 때 사용자 직접 호출로 간주하여 진행 상태 체크
   const healthCheck = async (serverId: string, serverPort: number, fromUser: boolean = false) => {
     const currentServer = servers.find((server) => server.id === serverId);
     if (fromUser && currentServer && currentServer.status === "PROGRESS") {
@@ -129,7 +141,6 @@ const Servers = forwardRef((props: ServerProps, ref) => {
       console.error("Error starting server:", error);
     }
 
-    // 내부 호출 시에는 fromUser를 false로 전달해 진행 상태 체크를 건너뜁니다.
     await healthCheck(serverId, serverPort, false);
   };
 
@@ -177,7 +188,6 @@ const Servers = forwardRef((props: ServerProps, ref) => {
     return "FAIL";
   };
 
-  // 모든 서버에 대해 healthCheck를 실행하여 상태를 업데이트하고 전체 상태를 반환하는 함수
   const statusAll = async (): Promise<string> => {
     for (const server of servers) {
       await healthCheck(server.id, server.port);
@@ -244,7 +254,6 @@ const Servers = forwardRef((props: ServerProps, ref) => {
               </td>
               <td className="p-2">
                 <div className="flex space-x-1">
-                  {/* 버튼 클릭 시 내부 함수에서 진행 상태를 체크합니다. */}
                   <button
                     className="bg-green-600 text-white px-3 py-1 rounded"
                     onClick={() => startServer(server.id, server.port, true)}

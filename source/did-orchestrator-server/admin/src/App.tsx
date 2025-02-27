@@ -1,3 +1,19 @@
+/*
+ * Copyright 2025 OmniOne.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import Servers from "./Servers";
 import Repositories from "./Repositories";
@@ -15,27 +31,22 @@ const generateRandomDid = (): string => {
 };
 
 const App: React.FC = () => {
-  // isSaving 상태: Save 작업이 진행되는 동안 progress overlay를 표시하기 위한 상태
   const [isSaving, setIsSaving] = useState(false);
   const [popupDid, setPopupDid] = useState<string | null>(null);
   const [popupWallet, setPopupWallet] = useState<string | null>(null);
   const [popupGenAll, setPopupGenAll] = useState(false);
 
-  // localStorage에서 초기 "allStatus" 값을 불러오고, 없으면 "⚪"를 기본값으로 사용합니다.
   const [status, setStatus] = useState<string>(() => {
     const stored = localStorage.getItem("allStatus");
     return stored ? stored : "⚪";
   });
 
-  // status가 변경될 때마다 localStorage에 저장합니다.
   useEffect(() => {
     localStorage.setItem("allStatus", status);
   }, [status]);
 
-  // 최초 구동 여부를 체크하기 위한 ref
   const hasMountedRef = useRef(false);
 
-  // ref 콜백을 통해 최초 한 번만 statusAll() 호출
   const sectionRef = (node: HTMLElement | null) => {
     if (node && !hasMountedRef.current) {
       hasMountedRef.current = true;
@@ -50,33 +61,39 @@ const App: React.FC = () => {
   const openGenerateAll = () => setPopupGenAll(true);
   const closeGenerateAll = () => setPopupGenAll(false);
 
+  const genAllSubmitGenAllPasswordRef = useRef<HTMLInputElement>(null);
+  const genAllSubmitGenAllConfirmPasswordRef = useRef<HTMLInputElement>(null);
+
   const handleGenAllSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const formData = new FormData(e.currentTarget);
     const password = formData.get("genAllPassword") as string;
     const confirmPassword = formData.get("genAllConfirmPassword") as string;
-    if (password == "" || confirmPassword == "") {
+    if (password == "") {
       alert("Please enter your password.");
+      genAllSubmitGenAllPasswordRef.current?.focus();
       return;
     }
-    if (password !== confirmPassword) {
+    if (password !== confirmPassword || confirmPassword == "") {
       alert("Passwords do not match!");
+      genAllSubmitGenAllConfirmPasswordRef.current?.focus();
       return;
     }
     
     try {
-      setIsSaving(true); // 작업 시작 -> overlay 표시
+      setIsSaving(true);
 
       var apiResponse;
-      // 월렛 & Key & DID Document 일괄 생성 Start (추후 튜닝 필요)
       const serversData = localStorage.getItem("servers");
       if (serversData) {
+      /*
         try {
           const servers = JSON.parse(serversData);
           if (Array.isArray(servers)) {
             for (let i = 0; i < servers.length; i++) {
               if (servers[i].id === "api") {
-                continue; // id가 "api"인 경우 제외
+                continue;
               }
 
               var serverId = servers[i].id;
@@ -90,7 +107,7 @@ const App: React.FC = () => {
               if(serverId == "tas") {
                 type = "TAS";
               }
-        
+
               apiResponse = await fetch("/create/wallet", {
                 method: "POST",
                 headers: {
@@ -98,13 +115,13 @@ const App: React.FC = () => {
                 },
                 body: JSON.stringify({ filename : filename, password }),
               });
-          
+
               if (!apiResponse.ok) {
                 const errorData = await apiResponse.json();
                 alert(`Generation All creation failed: ${errorData.message || "Unknown error."}`);
                 return;
               }
-        
+
               apiResponse = await fetch("/create/keys", {
                 method: "POST",
                 headers: {
@@ -112,13 +129,13 @@ const App: React.FC = () => {
                 },
                 body: JSON.stringify({ filename, password, keyIds: keyIds }),
               });
-        
+
               if (!apiResponse.ok) {
                 const errorData = await apiResponse.json();
                 alert(`Generation All creation failed: ${errorData.message || "Unknown error."}`);
                 return;
               }
-        
+
               apiResponse = await fetch("/create/diddoc", {
                 method: "POST",
                 headers: {
@@ -126,7 +143,7 @@ const App: React.FC = () => {
                 },
                 body: JSON.stringify({ filename, password, did : "did:omn:" + filename, controller : "did:omn:tas", type : type }),
               });
-        
+
               if (!apiResponse.ok) {
                 const errorData = await apiResponse.json();
                 alert(`Generation All creation failed: ${errorData.message || "Unknown error."}`);
@@ -141,8 +158,24 @@ const App: React.FC = () => {
         } catch (error) {
           alert(`Generation All creation failed`);
         } finally {
-          setIsSaving(false); // 작업 종료 -> overlay 숨김
+          setIsSaving(false);
         }
+      */
+        apiResponse = await fetch("/create/all", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+          },
+          body: JSON.stringify({ password }),
+        });
+
+        if (!apiResponse.ok) {
+          const errorData = await apiResponse.json();
+          alert(`Generation All creation failed: ${errorData.message || "Unknown error."}`);
+          return;
+        }
+        alert(`Generation All created successfully!`);
+        closeGenerateAll();
       } else {
         alert(`Generation All creation failed - No servers data found in localStorage.`);
       }
@@ -150,26 +183,39 @@ const App: React.FC = () => {
       console.error("Error creating wallet:", error);
       alert("An error occurred while creating the wallet.");
     } finally {
-      setIsSaving(false); // 작업 종료 -> overlay 숨김
+      setIsSaving(false);
     }
   };
+
+  const walletSubmitDidRefWalletRef = useRef<HTMLInputElement>(null);
+  const walletSubmitDidRefPasswordRef = useRef<HTMLInputElement>(null);
+  const walletSubmitDidRefConfirmPasswordRef = useRef<HTMLInputElement>(null);
 
   const handleWalletSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+
     const filename = formData.get("walletName") as string;
     const password = formData.get("walletPassword") as string;
     const confirmPassword = formData.get("walletConfirmPassword") as string;
-    if (password == "" || confirmPassword == "") {
-      alert("Please enter your password.");
+
+    if (filename == "") {
+      alert("Please enter your wallet name.");
+      walletSubmitDidRefWalletRef.current?.focus();
       return;
     }
-    if (password !== confirmPassword) {
+    if (password == "") {
+      alert("Please enter your password.");
+      walletSubmitDidRefPasswordRef.current?.focus();
+      return;
+    }
+    if (password !== confirmPassword || confirmPassword == "") {
       alert("Passwords do not match!");
+      walletSubmitDidRefConfirmPasswordRef.current?.focus();
       return;
     }
 
-    setIsSaving(true); // 작업 시작 -> overlay 표시
+    setIsSaving(true);
 
     var keyIds = ["assert", "auth", "keyagree"];
     if (filename == "tas") {
@@ -211,15 +257,23 @@ const App: React.FC = () => {
       console.error("Error creating wallet:", error);
       alert("An error occurred while creating the wallet.");
     } finally {
-      setIsSaving(false); // 작업 종료 -> overlay 숨김
+      setIsSaving(false);
     }
   };
+
+  const didSubmitDidRef = useRef<HTMLInputElement>(null);
+  const didSubmitDidRefWalletRef = useRef<HTMLInputElement>(null);
+  const didSubmitDidRefPasswordRef = useRef<HTMLInputElement>(null);
+  const didSubmitDidRefConfirmPasswordRef = useRef<HTMLInputElement>(null);
 
   const handleDidSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+
     const did = formData.get("did") as string;
     const walletName = formData.get("walletName") as string;
+    const password = formData.get("didPassword") as string;
+    const confirmPassword = formData.get("didConfirmPassword") as string;
 
     if (walletName == "tas") {
       localStorage.setItem("didType", "TAS");
@@ -227,14 +281,30 @@ const App: React.FC = () => {
       localStorage.setItem("didType", "ENTITY");
     }
 
-    const password = formData.get("didPassword") as string;
-    const confirmPassword = formData.get("didConfirmPassword") as string;
-    if (password == "" || confirmPassword == "") {
-      alert("Please enter your password.");
+    if (did == "") {
+      alert("Please enter your DID.");
+      didSubmitDidRef.current?.focus();
       return;
     }
-    if (password !== confirmPassword) {
+    const didRegex = /^did:[a-zA-Z0-9]+:[a-zA-Z0-9]+$/;
+    if (!didRegex.test(did)) {
+      alert("Please follow the DID format.");
+      didSubmitDidRef.current?.focus();
+      return;
+    }
+    if (walletName == "") {
+      alert("Please enter your wallet name.");
+      didSubmitDidRefWalletRef.current?.focus();
+      return;
+    }
+    if (password == "") {
+      alert("Please enter your password.");
+      didSubmitDidRefPasswordRef.current?.focus();
+      return;
+    }
+    if (password !== confirmPassword || confirmPassword == "") {
       alert("Passwords do not match!");
+      didSubmitDidRefConfirmPasswordRef.current?.focus();
       return;
     }
 
@@ -246,7 +316,7 @@ const App: React.FC = () => {
 
     const filename = walletName;
 
-    setIsSaving(true); // 작업 시작 -> overlay 표시
+    setIsSaving(true);
 
     try {
       const walletResponse = await fetch("/create/diddoc", {
@@ -264,7 +334,6 @@ const App: React.FC = () => {
       }
 
       if (type == "TAS") {
-        // 최종적으로 저장이 성공적으로 수행된 TAS의 did를 기억
         localStorage.setItem("didController", did);
       }
 
@@ -274,11 +343,10 @@ const App: React.FC = () => {
       console.error("Error creating wallet:", error);
       alert("An error occurred while creating the DID Document.");
     } finally {
-      setIsSaving(false); // 작업 종료 -> overlay 숨김
+      setIsSaving(false);
     }
   };
 
-  // 자식 컴포넌트(Repositories, Servers)에서 제공하는 startAll, stopAll, statusAll 함수를 호출하기 위한 ref 생성
   const repositoriesRef = useRef<{
     startAll: () => Promise<void>;
     stopAll: () => Promise<void>;
@@ -300,7 +368,6 @@ const App: React.FC = () => {
     healthCheckDemo: () => Promise<string>;
   } | null>(null);
 
-  // 모든 엔티티에 대해 순차적으로 시작 요청 시 진행 상태를 "PROGRESS"로 저장 후, 완료되면 "🟢"로 업데이트
   const startAll = async () => {
     if (status === "PROGRESS") {
       alert("The operation is currently in progress. Please try again later.");
@@ -321,7 +388,6 @@ const App: React.FC = () => {
     statusAll();
   };
 
-  // 모든 엔티티에 대해 순차적으로 중지 요청 시 진행 상태를 "PROGRESS"로 저장 후, 완료되면 "⚪"로 업데이트
   const stopAll = async () => {
     if (status === "PROGRESS") {
       alert("The operation is currently in progress. Please try again later.");
@@ -342,7 +408,6 @@ const App: React.FC = () => {
     statusAll();
   };
 
-  // Status All 버튼 클릭 시 각 컴포넌트의 statusAll 함수를 호출하여 전체 상태를 업데이트합니다.
   const statusAll = async () => {
     setStatus("PROGRESS");
 
@@ -499,7 +564,6 @@ const App: React.FC = () => {
         </main>
       </div>
 
-      {/* Popup Overlays */}
       {/* Gen All Popup */}
       {popupGenAll && (
         <div id="popup-overlay-genall" className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
@@ -508,11 +572,11 @@ const App: React.FC = () => {
             <form onSubmit={handleGenAllSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Password</label>
-                <input type="password" name="genAllPassword" className="w-full border p-2 rounded" autoFocus />
+                <input type="password" name="genAllPassword" ref={genAllSubmitGenAllPasswordRef} className="w-full border p-2 rounded" maxLength={10} autoFocus />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Confirm Password</label>
-                <input type="password" name="genAllConfirmPassword" className="w-full border p-2 rounded" />
+                <input type="password" name="genAllConfirmPassword" ref={genAllSubmitGenAllConfirmPasswordRef} className="w-full border p-2 rounded" maxLength={10} />
               </div>
               <div className="flex justify-end space-x-2">
                 <button type="button" onClick={closeGenerateAll} className="px-4 py-2 border rounded text-gray-700">
@@ -535,19 +599,19 @@ const App: React.FC = () => {
             <form onSubmit={handleDidSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">DID</label>
-                <input type="text" name="did" className="w-full border p-2 rounded" defaultValue={generateRandomDid()} />
+                <input type="text" name="did" ref={didSubmitDidRef} className="w-full border p-2 rounded" defaultValue={generateRandomDid()} maxLength={35} />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Wallet Name</label>
-                <input type="text" name="walletName" className="w-full border p-2 rounded" defaultValue={popupDid} />
+                <input type="text" name="walletName" ref={didSubmitDidRefWalletRef} className="w-full border p-2 rounded" defaultValue={popupDid} maxLength={10} />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Password</label>
-                <input type="password" name="didPassword" className="w-full border p-2 rounded" autoFocus />
+                <input type="password" name="didPassword" ref={didSubmitDidRefPasswordRef} className="w-full border p-2 rounded" maxLength={10} autoFocus />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Confirm Password</label>
-                <input type="password" name="didConfirmPassword" className="w-full border p-2 rounded" />
+                <input type="password" name="didConfirmPassword" ref={didSubmitDidRefConfirmPasswordRef} className="w-full border p-2 rounded" maxLength={10} />
               </div>
               <div className="flex justify-end space-x-2">
                 <button type="button" onClick={closePopupDid} className="px-4 py-2 border rounded text-gray-700">
@@ -570,15 +634,15 @@ const App: React.FC = () => {
             <form onSubmit={handleWalletSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Wallet Name</label>
-                <input type="text" name="walletName" className="w-full border p-2 rounded" defaultValue={popupWallet} />
+                <input type="text" name="walletName" ref={walletSubmitDidRefWalletRef} className="w-full border p-2 rounded" defaultValue={popupWallet} />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Password</label>
-                <input type="password" name="walletPassword" className="w-full border p-2 rounded" autoFocus />
+                <input type="password" name="walletPassword" ref={walletSubmitDidRefPasswordRef} className="w-full border p-2 rounded" autoFocus />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-bold text-gray-700">Confirm Password</label>
-                <input type="password" name="walletConfirmPassword" className="w-full border p-2 rounded" />
+                <input type="password" name="walletConfirmPassword" ref={walletSubmitDidRefConfirmPasswordRef} className="w-full border p-2 rounded" />
               </div>
               <div className="flex justify-end space-x-2">
                 <button type="button" onClick={closePopupWallet} className="px-4 py-2 border rounded text-gray-700">
