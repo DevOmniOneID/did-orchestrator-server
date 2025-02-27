@@ -11,7 +11,7 @@
 ## 3. 화면 구성
 Orchestrator의 화면은 다음과 같은 주요 섹션으로 구성됩니다.
 
-![freepik license](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-frontend/refs/heads/main/orchestrator.png)
+![freepik license](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/orchestrator.png)
 
 
 ### 3.1 Quick Start
