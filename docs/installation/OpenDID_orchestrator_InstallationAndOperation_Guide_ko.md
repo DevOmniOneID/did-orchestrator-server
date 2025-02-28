@@ -27,8 +27,8 @@ git clone https://github.com/OmniOneID/did-orchestrator-server.git
 ---
 
 ## 3. download.sh 실행
-OpenDID Orchestrator는 개별 서버 엔티티들을 구동 및 관리하는 역할을 하므로, 각각의 개별 서버 엔티티들에 대한 형상 다운로드가 필요합니다.<br>
-아래 명령어를 터미널에 입력하여 download.sh을 실행하여 서버 엔티티들을 다운로드하세요.
+OpenDID Orchestrator는 개별 서버 엔티티들을 구동 및 관리하는 역할을 하므로, 각각의 개별 서버 엔티티 형상에 대한 다운로드가 필요합니다.<br>
+아래 명령어를 터미널에 입력하여 download.sh을 실행하여 개별 서버 엔티티들을 다운로드하세요.
 
 ```bash
 cd did-orchestrator-server/source/
