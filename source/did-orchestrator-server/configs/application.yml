@@ -3,14 +3,8 @@ spring:
     name: orchestrator
   profiles:
     default: dev
-    group:
-        dev:
-          - logging
-          - spring-docs
-          - demo
   jackson:
     default-property-inclusion: non_null
-
 management:
   endpoints:
     web:
@@ -21,14 +15,11 @@ management:
       enabled: true
     startup:
       enabled: true
-
 server:
   port: 9001
-
 blockchain:
   channel: mychannel
   chaincodeName: opendid
-
 database:
   port: 5430
   user: omn
@@ -69,3 +60,18 @@ services:
       name: Demo
       port: 8099
       file: did-demo-server-1.0.0.jar
+logging:
+  level:
+    org.omnione: debug
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: ASC
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
