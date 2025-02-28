@@ -11,7 +11,7 @@ This manual describes the key features, screen structure, usage instructions, an
 ## 3. Screen Structure
 The Orchestrator interface consists of the following main sections:
 
-![Screen Structure](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/orchestrator.png)
+![Screen Structure](https://raw.githubusercontent.com/OmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/orchestrator.png)
 
 ### 3.1 Quick Start
 Provides functions to manage all services and entities collectively.
@@ -30,7 +30,7 @@ Provides functions to manage all services and entities collectively.
 - **Wallet and DID Document Generation**:
   - By entering a password, a Wallet and DID Document are created for each entity name.
 
-![Generate All Screen](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/generate_all.png)
+![Generate All Screen](https://raw.githubusercontent.com/OmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/generate_all.png)
 
 ### 3.2 Repositories
 Provides functions to manage key services (e.g., Hyperledger Fabric, PostgreSQL) individually.
@@ -68,12 +68,12 @@ Provides functions to manage individual servers.
 - **Wallet Generation**:
   - By entering the Wallet name and password, a Wallet for the corresponding entity is created.
 
-![Wallet Generation Screen](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/wallet.png)
+![Wallet Generation Screen](https://raw.githubusercontent.com/OmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/wallet.png)
 
 - **DID Document Generation**:
   - By entering the same name, DID, and password as the generated Wallet, a DID Document for the corresponding entity is created.
 
-![DID Document Generation Screen](https://raw.githubusercontent.com/DevOmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/diddoc.png)
+![DID Document Generation Screen](https://raw.githubusercontent.com/OmniOneID/did-orchestrator-server/refs/heads/main/docs/manual/diddoc.png)
 
 ## 4. Precautions
 - **Server Start/Stop Time**: When using the `Start` or `Stop` button, the operation may take some time depending on the server execution environment.
