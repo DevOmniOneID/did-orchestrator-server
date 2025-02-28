@@ -18,9 +18,18 @@ package org.omnione.did.base.exception;
 
 public enum ErrorCode {
     UNKNOWN_SERVER_ERROR("9999", "An unknown server error has occurred.", 500),
-    INVALID_PORT_NUMBER("1000","Invalid port number.", 400),
-    JSON_PROCESSING_ERROR("8004", "Error occurred while processing JSON data.", 400),
-    ;
+    INVALID_PORT_NUMBER("1000", "Invalid port number.", 400),
+    YAML_READ_ERROR("1001", "Error occurred while reading the YAML configuration file.", 500),
+    YAML_WRITE_ERROR("1002", "Error occurred while writing to the YAML configuration file.", 500),
+    FABRIC_STARTUP_FAILED("2001", "Hyperledger Fabric startup failed.", 500),
+    FABRIC_SHUTDOWN_FAILED("2002", "Hyperledger Fabric shutdown failed.", 500),
+    POSTGRE_STARTUP_FAILED("3001", "PostgreSQL startup failed.", 500),
+    POSTGRE_SHUTDOWN_FAILED("3002", "PostgreSQL shutdown failed.", 500),
+    POSTGRE_HEALTH_CHECK_FAILED("3003", "PostgreSQL health check failed.", 500),
+    FABRIC_HEALTH_CHECK_FAILED("2003", "Hyperledger Fabric health check failed.", 500),
+    INVALID_PASSWORD("4001", "The provided password is incorrect.", 401),
+    CONFIG_UPDATE_FAILED("5001", "Failed to update the configuration.", 500);
+
 
     private final String code;
     private final String message;

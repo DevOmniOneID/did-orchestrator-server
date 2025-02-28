@@ -94,6 +94,11 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         void onStartupComplete();
         void onStartupFailed();
     }
+
+    /**
+     * Starts all servers in the list if they are not already running.
+     * This method checks all servers' status, and starts any server that is not already running.
+     */
     @Override
     public void requestStartupAll() {
         try {
@@ -109,6 +114,10 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         }
     }
 
+    /**
+     * Shuts down all servers in the list if they are running.
+     * This method checks all servers' status, and stops any server that is currently running.
+     */
     @Override
     public void requestShutdownAll() {
         try {
@@ -123,12 +132,20 @@ public class OrchestratorServiceImpl implements OrchestratorService{
             throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
     }
-    
+
+    /**
+     * Starts the server on the given port.
+     * This method attempts to start the server on the provided port if it's not already running.
+     *
+     * @param port the port on which the server should be started
+     * @return the response status indicating the success or failure of the startup process
+     * @throws OpenDidException if an error occurs during the startup process
+     */
     @Override
     public OrchestratorResponseDto requestStartup(String port) throws OpenDidException {
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("Unknown error");
-        log.debug("Startup request for port: " + port);
+        log.info("Startup request for port: " + port);
         try {
             response.setStatus(startServer(port));
         } catch (IOException | InterruptedException e) {
@@ -137,11 +154,19 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Stops the server on the given port.
+     * This method attempts to stop the server on the provided port if it is currently running.
+     *
+     * @param port the port on which the server should be stopped
+     * @return the response status indicating the success or failure of the shutdown process
+     * @throws OpenDidException if an error occurs during the shutdown process
+     */
     @Override
     public OrchestratorResponseDto requestShutdown(String port) throws OpenDidException {
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("Unknown error");
-        log.debug("shutdown request for port: " + port);
+        log.info("shutdown request for port: " + port);
         try {
             response.setStatus(stopServer(port));
         } catch (InterruptedException e) {
@@ -150,16 +175,30 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Checks the health status of the server on the given port.
+     * This method returns "UP" if the server is running, and "DOWN" otherwise.
+     *
+     * @param port the port of the server whose health status should be checked
+     * @return the health status of the server (either "UP" or "DOWN")
+     */
     @Override
     public OrchestratorResponseDto requestHealthCheck(String port) {
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         response.setStatus("DOWN");
-        log.debug("requestHealthCheck for port: " + port);
+        log.info("requestHealthCheck for port: " + port);
         if(isServerRunning(port))
             response.setStatus("UP");
         return response;
     }
 
+    /**
+     * Refreshes the configuration of the server on the given port.
+     * This method sends a request to the server's refresh endpoint and returns the response.
+     *
+     * @param port the port of the server to refresh
+     * @return the response status indicating the success of the refresh operation
+     */
     @Override
     public OrchestratorResponseDto requestRefresh(String port) {
         String targetUrl = getServerUrl() + port + "/actuator/refresh";
@@ -170,14 +209,21 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         ResponseEntity<String> response = restTemplate.postForEntity(targetUrl, requestEntity, String.class);
 
         String responseBody = response.getBody();
-        log.debug("refresh : " + responseBody);
+        log.info("refresh : " + responseBody);
         OrchestratorResponseDto dto = new OrchestratorResponseDto();
         dto.setStatus("SUCCESS");
         return dto;
     }
+
+    /**
+     * Starts Hyperledger Fabric if it is not already running.
+     * This method executes the `start.sh` script for Fabric, waits for startup logs, and checks the health of the Fabric server.
+     *
+     * @return the status of the Fabric server (UP or ERROR)
+     */
     @Override
     public OrchestratorResponseDto requestStartupFabric() {
-        log.debug("requestStartupFabric");
+        log.info("requestStartupFabric");
         String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
         String logFilePath = LOGS_PATH + "/fabric.log";
         
@@ -207,25 +253,19 @@ public class OrchestratorServiceImpl implements OrchestratorService{
                 }
             });
 
-            OrchestratorResponseDto response = requestHealthCheckFabric();
-//            if(response.getStatus().equals("UP")){
-            // fabric.log 파일삭제
-//                File logFile = new File(logFilePath);
-//                if (logFile.exists()) {
-//                    boolean deleted = logFile.delete();
-//                    if (deleted) {
-//                        log.debug("Fabric log file deleted: " + logFilePath);
-//                    } else {
-//                        log.debug("Failed to delete fabric.log file.");
-//                    }
-//                }
-//            }
-            return response;
+            return requestHealthCheckFabric();
         } catch (IOException | InterruptedException e) {
             throw new OpenDidException(ErrorCode.UNKNOWN_SERVER_ERROR);
         }
     }
 
+    /**
+     * Watches the Fabric startup logs for success or failure.
+     * This method monitors the log file and triggers the provided callback when the startup completes or fails.
+     *
+     * @param logFilePath the path to the Fabric log file
+     * @param callback the callback to invoke on startup completion or failure
+     */
     private void watchFabricLogs(String logFilePath, FabricStartupCallback callback) {
         File logFile = new File(logFilePath);
         log.debug("Monitoring log file: " + logFilePath);
@@ -262,9 +302,15 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         }
     }
 
+    /**
+     * Shuts down Hyperledger Fabric by executing the `stop.sh` script.
+     * This method stops the Fabric service and checks its status after shutdown.
+     *
+     * @return the status of the Fabric server (DOWN or ERROR)
+     */
     @Override
     public OrchestratorResponseDto requestShutdownFabric() {
-        log.debug("requestShutdownFabric");
+        log.info("requestShutdownFabric");
         try {
             String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
             ProcessBuilder builder = new ProcessBuilder("sh", fabricShellPath + "/stop.sh");
@@ -279,9 +325,15 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Checks the health of the Hyperledger Fabric server.
+     * This method checks whether Fabric is up and running by executing the `status.sh` script.
+     *
+     * @return the health status of the Fabric server (UP or ERROR)
+     */
     @Override
     public OrchestratorResponseDto requestHealthCheckFabric() {
-        log.debug("requestHealthCheckFabric");
+        log.info("requestHealthCheckFabric");
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
@@ -302,9 +354,15 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Resets Hyperledger Fabric by executing the `reset.sh` script.
+     * This method attempts to reset Fabric and checks if the reset was successful.
+     *
+     * @return the status of the Fabric reset (UP or ERROR)
+     */
     @Override
     public OrchestratorResponseDto requestResetFabric() {
-        log.debug("requestResetFabric");
+        log.info("requestResetFabric");
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String fabricShellPath = System.getProperty("user.dir") + "/shells/Fabric";
@@ -324,9 +382,16 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         response.setStatus("ERROR");
         return response;
     }
+
+    /**
+     * Starts PostgreSQL by executing the `start.sh` script.
+     * This method starts the PostgreSQL service and checks if it started successfully.
+     *
+     * @return the status of the PostgreSQL server (UP or ERROR)
+     */
     @Override
     public OrchestratorResponseDto requestStartupPostgre() {
-        log.debug("requestStartupPostgre");
+        log.info("requestStartupPostgre");
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String postgreShellPath = System.getProperty("user.dir") + "/shells/Postgre";
@@ -346,9 +411,15 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Stops PostgreSQL by executing the `stop.sh` script.
+     * This method stops the PostgreSQL service and checks if it stopped successfully.
+     *
+     * @return the status of the PostgreSQL server (DOWN or ERROR)
+     */
     @Override
     public OrchestratorResponseDto requestShutdownPostgre() {
-        log.debug("requestShutdownPostgre");
+        log.info("requestShutdownPostgre");
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String postgreShellPath = System.getProperty("user.dir") + "/shells/Postgre";
@@ -368,9 +439,15 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Checks the health of the PostgreSQL server.
+     * This method checks whether PostgreSQL is up and running by executing the `status.sh` script.
+     *
+     * @return the health status of the PostgreSQL server (UP or ERROR)
+     */
     @Override
     public OrchestratorResponseDto requestHealthCheckPostgre() {
-        log.debug("requestHealthCheckPostgre");
+        log.info("requestHealthCheckPostgre");
         OrchestratorResponseDto response = new OrchestratorResponseDto();
         try {
             String postgreShellPath = System.getProperty("user.dir") + "/shells/Postgre";
@@ -392,9 +469,16 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Performs batch creation of wallets and DID documents for all entities.
+     * This method triggers the execution of a shell script to create wallets and DID documents for all related entities using the provided password.
+     *
+     * @param password the password used for creating the wallets and DID documents
+     * @return a response indicating the success or failure of the creation process
+     */
     @Override
     public OrchestratorResponseDto createAll(String password) {
-        log.debug("createAll : " + password);
+        log.info("createAll : " + password);
         OrchestratorResponseDto response = new OrchestratorResponseDto();
 
         Process process = null;
@@ -428,6 +512,14 @@ public class OrchestratorServiceImpl implements OrchestratorService{
 
     }
 
+    /**
+     * Creates a wallet using the specified file name and password.
+     * This method triggers the execution of a shell script to create a wallet and write the provided password to it.
+     *
+     * @param fileName the name of the wallet to create
+     * @param password the password to be used for creating the wallet
+     * @return response indicating the success or failure of the wallet creation process
+     */
     @Override
     public OrchestratorResponseDto createWallet(String fileName, String password) {
         log.debug("createWallet : " + fileName + " / " + password);
@@ -490,6 +582,15 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Creates keys for a specified wallet using a list of key IDs and the provided password.
+     * This method triggers the execution of a shell script to create keys for the wallet.
+     *
+     * @param fileName the name of the wallet for which keys are to be created
+     * @param password the password for the wallet
+     * @param keyIds the list of key IDs to be created
+     * @return response indicating the success or failure of key creation process
+     */
     @Override
     public OrchestratorResponseDto createKeys(String fileName, String password, List<String> keyIds) {
         log.debug("createKeys : " + fileName + " / " + password);
@@ -554,6 +655,17 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Creates a DID document for the specified wallet and writes the provided password to it.
+     * This method triggers the execution of a shell script to create a DID document for the wallet.
+     *
+     * @param fileName the name of the wallet and DID document
+     * @param password the password to be used for creating the DID document
+     * @param did the DID to be used in the document
+     * @param controller the controller of the DID document
+     * @param type the type of the DID document
+     * @return response indicating the success or failure of the DID document creation process
+     */
     @Override
     public OrchestratorResponseDto createDidDocument(String fileName, String password, String did, String controller, String type) {
         log.debug("createDidDocument : " + fileName + " / " + password + " / " + did + " / " + controller);
@@ -616,6 +728,13 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return response;
     }
 
+    /**
+     * Retrieves the IP address of the server.
+     * This method iterates through all network interfaces and returns the first non-loopback IPv4 address that is up.
+     * If no valid IP address is found, it returns "Unknown IP".
+     *
+     * @return the IP address of the server or "Unknown IP" if no valid address is found
+     */
     @Override
     public String getServerIp() {
         try {
@@ -642,6 +761,13 @@ public class OrchestratorServiceImpl implements OrchestratorService{
         return "Unknown IP";
     }
 
+    /**
+     * Updates the configuration stored in the YAML file.
+     * This method loads the existing configuration, applies the updates, and writes the modified configuration back to the YAML file.
+     *
+     * @param updates a map containing the updates to apply to the configuration
+     * @return a response indicating the success or failure of the update process
+     */
     @Override
     public OrchestratorResponseDto updateConfig(Map<String, Object> updates) {
         OrchestratorResponseDto response = new OrchestratorResponseDto();

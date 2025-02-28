@@ -23,9 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface OrchestratorService {
-    void requestStartupAll();
-    void requestShutdownAll();
-
     //Hyperledger Fabric
     OrchestratorResponseDto requestStartupFabric();
     OrchestratorResponseDto requestShutdownFabric();
@@ -37,12 +34,15 @@ public interface OrchestratorService {
     OrchestratorResponseDto requestShutdownPostgre();
     OrchestratorResponseDto requestHealthCheckPostgre();
 
-    //서버
+    //entities
+    void requestStartupAll();
+    void requestShutdownAll();
     OrchestratorResponseDto requestStartup(String port) throws OpenDidException;
     OrchestratorResponseDto requestShutdown(String port) throws OpenDidException;
     OrchestratorResponseDto requestHealthCheck(String port) throws OpenDidException;
     OrchestratorResponseDto requestRefresh(String port);
 
+    //cli-tool
     OrchestratorResponseDto createAll(String password);
     OrchestratorResponseDto createWallet(String fileName, String password);
     OrchestratorResponseDto createKeys(String fileName, String password, List<String> keyIds);
