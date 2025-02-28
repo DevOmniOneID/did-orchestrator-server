@@ -11,7 +11,7 @@ Here's an overview of the directory structure.
 did-orchestrator-server
 ├── gradle
 ├── libs
-├── admin
+└── admin
     └── src
     └── public
     └── build.sh
@@ -34,8 +34,8 @@ Below is a description of each folder and file in the directory:
 | did-orchestrator-server | Orchestrator Server source code and build files         |
 | ┖ gradle       | Gradle build configurations and scripts       |
 | ┖ libs         | External libraries and dependencies           |
-| ┖ admin       | ddddd                                 |
-| ┖ src          | Main source code directory                    |
+| ┖ admin        | Front-end related source code directory       |
+| ┖ src          | Back-end source code directory                |
 | ┖ build.gradle | Gradle build configuration file               |
 | ┖ README.md    | Overview and instructions for the source code |
 
@@ -81,7 +81,7 @@ The built static files will be created in the `build` directory, and these files
 
 Refer to the following documents for more detailed information:
 
-- [API Reference](../../docs/api/TAS_API_ko.md)  
+- [API Reference](../../docs/api/Orchestrator_API.md)  
   Detailed reference for the TAS Server's API endpoints.
 
 - [OpenDID orchestrator InstallationAndOperation Guide](../../docs/installation/OpenDID_orchestrator_InstallationAndOperation_Guide.md)  
