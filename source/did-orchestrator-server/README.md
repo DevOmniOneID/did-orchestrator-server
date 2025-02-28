@@ -1,43 +1,98 @@
-DID Orchestrator Server Source
+DID Orchestrator Server Source Code
 ==
 
-본 폴더는 Orchestrator 서버 소스 코드 및 빌드 파일 영역입니다.<br>
-DID Orchestrator Server 자체에 대한 설명은 [README.md](../../README_ko.md)를 참조해 주십시오.
+Welcome to the DID Orchestrator Server source code repository. This directory contains the core source code and build configurations for the DID Orchestrator Server.
 
-## 1. Back-end 영역 구성요소
-본 영역은 기본적으로 Back-end에 해당하는 서버 사이드에 대한 구성요소를 포함하고 있습니다. 주요 항목은 아래와 같습니다.
+## Directory Structure
 
-- `gradle` : Gradle 빌드 설정 및 스크립트
-- `libs` : 외부 라이브러리 및 종속성
-- `src` : 주요 소스 코드 디렉터리
-- `build.gradle` : Gradle 빌드 설정 파일
+Here's an overview of the directory structure.
 
-## 2. Front-end 영역 구성요소
-Orchestrator 서버의 Front-end는 [TypeScript](https://www.typescriptlang.org/) 기반의 [React.js](https://react.dev/)로 개발되었으며, DID Orchestrator의 UI/UX를 제공하는 역할을 합니다.<br>
-관련 모든 구성요소는 admin 폴더 하위에 위치하며 주요 항목은 아래와 같습니다.
-
-- `src` : React 소스 코드 디렉터리
-- `public` : index.html 등 정적 파일 저장 디렉토리
-- `build.sh` : 프로젝트 빌드를 자동화하는 Bash 스크립트
-- `package.json` : 프로젝트의 메타데이터와 의존성 목록을 포함하는 파일
-- `package-lock.json` : package.json에서 정의된 의존성의 정확한 버전을 기록하는 파일
-- `postcss.config.js` : PostCSS 설정 파일
-- `tailwind.config.js` : Tailwind CSS 설정 파일
-- `tsconfig.jso` : TypeScript 설정 파일
-
-### React 실행 방법
-Front-end 어플리케이션은 `admin` 디렉터리 하위에서 아래 명령어를 사용하여 실행할 수 있습니다.
-
-```sh
-npm install  # 필요 시 의존성 패키지 설치
-npm start    # 개발 서버 실행
+```
+did-orchestrator-server
+├── gradle
+├── libs
+├── admin
+    └── src
+    └── public
+    └── build.sh
+    └── package.json
+    └── package-lock.json
+    └── postcss.config.js
+    └── tailwind.config.js
+    └── tsconfig.jso
+├── src
+└── build.gradle
+└── README.md
 ```
 
-### 빌드 및 배포
-정적 파일을 서버 사이드의 `resources/static` 디렉터리에 배포하려면 빌드 과정을 거쳐야 합니다.<br>이를 위해 `admin` 디렉터리 하위에서 `build.sh` 스크립트를 실행하면 자동으로 빌드 및 배포가 진행됩니다. 예제 커맨드는 다음과 같습니다.
+<br/>
+
+Below is a description of each folder and file in the directory:
+
+| Name           | Description                                   |
+| -------------- | --------------------------------------------- |
+| did-orchestrator-server | Orchestrator Server source code and build files         |
+| ┖ gradle       | Gradle build configurations and scripts       |
+| ┖ libs         | External libraries and dependencies           |
+| ┖ admin       | ddddd                                 |
+| ┖ src          | Main source code directory                    |
+| ┖ build.gradle | Gradle build configuration file               |
+| ┖ README.md    | Overview and instructions for the source code |
+
+
+## Libraries
+Libraries used in this project are organized into two main categories:
+
+1. **Front-end Third-Party Libraries**: The front-end of the Orchestrator server is developed based on [TypeScript](https://www.typescriptlang.org/) and [React.js](https://react.dev/), and it provides the UI/UX for the DID Orchestrator.
+
+2. **Back-end Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [LICENSE-dependencies.md](../../LICENSE-dependencies.md) file.
+
+## Front-end Components
+All front-end related components of the Orchestrator server are located under the admin folder, with the main items as follows:
+
+- `src` : React source code directory
+- `public` : Directory for storing static files such as index.html
+- `build.sh` : A bash script that automates the project build process
+- `package.json` : Contains metadata and a list of dependencies for the project
+- `package-lock.json` : Records the exact versions of the dependencies defined in package.json
+- `postcss.config.js` : PostCSS configuration file
+- `tailwind.config.js` : Tailwind CSS configuration file
+- `tsconfig.json` : TypeScript configuration file
+
+### React Execution Instructions
+The front-end application can be executed under the admin directory using the following commands:
 
 ```sh
-sh build.sh     # 빌드 및 배포, 빌드된 파일을 백엔드 리소스 영역으로 이동함
+npm install  # Install dependency packages if needed
+npm start    # Start the development server
 ```
 
-빌드된 정적 파일은 `build` 디렉터리에 생성되며, 이를 Back-end의 `resources/static` 디렉터리로 이동시키면 서버에서 해당 파일을 서빙할 수 있습니다.
+### Build and Deployment
+To deploy static files to the server-side `resources/static` directory, the build process must be completed. <br>
+To do this, run the `build.sh` script under the `admin` directory, which will automatically handle both the build and deployment processes. An example command is as follows:
+
+```sh
+sh build.sh     # Build and deploy, move the built files to the back-end resource area
+```
+
+The built static files will be created in the `build` directory, and these files can be moved to the back-end's `resources/static` directory for serving by the server.
+
+## Documenttation
+
+Refer to the following documents for more detailed information:
+
+- [API Reference](../../docs/api/TAS_API_ko.md)  
+  Detailed reference for the TAS Server's API endpoints.
+
+- [OpenDID orchestrator InstallationAndOperation Guide](../../docs/installation/OpenDID_orchestrator_InstallationAndOperation_Guide.md)  
+  Installation and configuration instructions.
+
+## Contributing
+
+Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](../../CODE_OF_CONDUCT.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## License
+[Apache 2.0](../../LICENSE)
+
+## Contact
+For questions or support, please contact [maintainers](../../MAINTAINERS.md).
