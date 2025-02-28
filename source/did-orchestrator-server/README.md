@@ -45,7 +45,7 @@ Libraries used in this project are organized into two main categories:
 
 1. **Front-end Third-Party Libraries**: The front-end of the Orchestrator server is developed based on [TypeScript](https://www.typescriptlang.org/) and [React.js](https://react.dev/), and it provides the UI/UX for the DID Orchestrator.
 
-2. **Back-end Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [LICENSE-dependencies.md](../../LICENSE-dependencies.md) file.
+2. **Back-end Third-Party Libraries**: These libraries are open-source dependencies managed via the [build.gradle](build.gradle) file. For a detailed list of third-party libraries and their licenses, please refer to the [LICENSE-dependencies.md](../../dependencies-license.md) file.
 
 ## Front-end Components
 All front-end related components of the Orchestrator server are located under the admin folder, with the main items as follows:
