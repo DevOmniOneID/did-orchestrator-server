@@ -82,7 +82,7 @@ The built static files will be created in the `build` directory, and these files
 Refer to the following documents for more detailed information:
 
 - [API Reference](../../docs/api/Orchestrator_API.md)  
-  Detailed reference for the TAS Server's API endpoints.
+  Detailed reference for the DID Orchestrator Server's API endpoints.
 
 - [OpenDID orchestrator InstallationAndOperation Guide](../../docs/installation/OpenDID_orchestrator_InstallationAndOperation_Guide.md)  
   Installation and configuration instructions.
