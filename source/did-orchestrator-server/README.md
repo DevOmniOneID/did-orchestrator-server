@@ -1,7 +1,7 @@
 DID Orchestrator Server Source
 ==
 
-이 곳은 Orchestrator 서버 소스 코드 및 빌드 파일 영역입니다.<br>
+본 폴더는 Orchestrator 서버 소스 코드 및 빌드 파일 영역입니다.<br>
 DID Orchestrator Server 자체에 대한 설명은 [README.md](../../README_ko.md)를 참조해 주십시오.
 
 ## 1. Back-end 영역 구성요소
@@ -16,7 +16,7 @@ DID Orchestrator Server 자체에 대한 설명은 [README.md](../../README_ko.m
 Orchestrator 서버의 Front-end는 [TypeScript](https://www.typescriptlang.org/) 기반의 [React.js](https://react.dev/)로 개발되었으며, DID Orchestrator의 UI/UX를 제공하는 역할을 합니다.<br>
 관련 모든 구성요소는 admin 폴더 하위에 위치하며 주요 항목은 아래와 같습니다.
 
-- `src` : React 소스 코드가 위치
+- `src` : React 소스 코드 디렉터리
 - `public` : index.html 등 정적 파일 저장 디렉토리
 - `build.sh` : 프로젝트 빌드를 자동화하는 Bash 스크립트
 - `package.json` : 프로젝트의 메타데이터와 의존성 목록을 포함하는 파일
