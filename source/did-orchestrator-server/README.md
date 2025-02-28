@@ -19,7 +19,7 @@ did-orchestrator-server
     └── package-lock.json
     └── postcss.config.js
     └── tailwind.config.js
-    └── tsconfig.jso
+    └── tsconfig.json
 ├── src
 └── build.gradle
 └── README.md
