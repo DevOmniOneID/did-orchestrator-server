@@ -37,7 +37,7 @@
 
 ## 1. Overview
 
-This document defines the API provided by the Orchestrator service. The Orchestrator is responsible for managing the startup, stop, status checks, and configuration management of various services.
+This document defines the API provided by the Orchestrator service. The Orchestrator is responsible for managing the startup, shutdown, status checks, and configuration management of various services.
 
 ---
 
