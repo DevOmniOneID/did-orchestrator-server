@@ -1,0 +1,16 @@
+name: Trigger Dependabot
+
+on:
+  schedule:
+    - cron: '* * * * *' # every mininutes
+  workflow_dispatch:
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Run Dependabot
+        run: |
+          dependabot --trigger
