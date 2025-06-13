@@ -46,7 +46,7 @@ Orchestrator의 화면은 다음과 같은 주요 섹션으로 구성됩니다.
     - ![green](./image/green_icon.png) 실행 중
     - ![red](./image/red_icon.png) 중지됨
   - **기능**
-    - `Start`: Hyperledger Fabric 서비스를 시작합니다.
+    - `Start`: Hyperledger besu 서비스를 시작합니다.
     - `Stop`: Hyperledger Fabric 서비스를 종료합니다.
     - `Status`: Hyperledger Fabric의 구동 상태를 확인합니다.
     - `Reset`: Hyperledger Fabric을 초기화합니다.
