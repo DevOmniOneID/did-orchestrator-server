@@ -65,8 +65,9 @@ jobs:
         id: get_commit_messages
         run: |
           commits=$(git log ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} --pretty=format:"* %s")
-          echo "$commits" > commit_messages.txt
-          echo "commits=$commits" >> $GITHUB_OUTPUT
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$commits" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Find JAR file
         id: find_jar
