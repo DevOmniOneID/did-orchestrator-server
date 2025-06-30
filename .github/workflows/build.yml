@@ -51,18 +51,19 @@ jobs:
 
       - name: Extract changelog entry
         id: changelog
-        working-directory: .
-        run: |
-          version_tag=${{ steps.set_release_title.outputs.release_tag }}
-          echo "Getting CHANGELOG for version: $version_tag"
+	run: |
+	  version_tag=${{ steps.set_release_title.outputs.release_tag }}
+	  echo "Extracting changelog for version: $version_tag"
 
-          changelog=$(awk "/^## $version_tag/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md)
-          changelog_cleaned=$(echo "$changelog" | sed '/^\s*$/d')
+	  changelog=$(awk "/^## $version_tag/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md)
+	  changelog_cleaned=$(echo "$changelog" | sed '/^\s*$/d')
 
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$changelog_cleaned" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-	  
+	  {
+	    echo 'changelog<<EOF'
+	    echo "$changelog_cleaned"
+	    echo 'EOF'
+	  } >> "$GITHUB_OUTPUT"
+    
       - name: Get commit messages
         id: get_commit_messages
         run: |
