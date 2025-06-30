@@ -59,7 +59,7 @@ jobs:
           echo 'changelog<<EOF' >> $GITHUB_OUTPUT
           echo "$changelog_cleaned" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
-	  
+
       - name: Get commit messages
         id: get_commit_messages
         run: |
