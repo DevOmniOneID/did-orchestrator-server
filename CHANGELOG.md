@@ -9,7 +9,7 @@
 - Manage individual servers with start, stop, status check, and access to Swagger and settings pages.
 - Create Wallets for each entity by entering a password.
 - Create DID documents based on the generated Wallet by entering a password.
-- 
+
 ## v2.0.0 (2025-06-28)
 
 ### 🚀 New Features
